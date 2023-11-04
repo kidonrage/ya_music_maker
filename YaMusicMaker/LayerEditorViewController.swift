@@ -25,6 +25,14 @@ class LayerEditorViewController: UIViewController {
     private let audioEngine: AVAudioEngine = AVAudioEngine()
     private let mixer = AVAudioMixerNode()
     private var players = Set<AVAudioPlayerNode>()
+    
+    private var outputBuffer = AVAudioPCMBuffer()
+    
+    var file: AVAudioFile?
+    
+    private let libraryDirPath = (NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0])
+    private let fileName = "test.caf"
+    private lazy var filePath = libraryDirPath + "/" + fileName
 
     override func viewDidLoad() {
         
@@ -34,6 +42,8 @@ class LayerEditorViewController: UIViewController {
         view.addSubview(sampleEditor)
         view.addSubview(control)
         view.addSubview(share)
+        
+        share.addTarget(self, action: #selector(shareButtonTapped), for: .touchUpInside)
         
         share.snp.makeConstraints { make in
             make.width.height.equalTo(50)
@@ -59,14 +69,71 @@ class LayerEditorViewController: UIViewController {
             loadSnares()
             loadKick()
             
+            setupTrackRecording()
+            
             for player in players {
                 player.play()
             }
         } catch {
             print("[TEST]", error.localizedDescription)
         }
+    }
+    
+    private func setupTrackRecording() {
+        if (FileManager.default.createFile(atPath: filePath, contents: nil, attributes: nil)) {
+            print("[TEST] File created successfully.")
+        } else {
+            print("[TEST] File not created.")
+        }
         
+        let tmpFileUrl = URL(fileURLWithPath: filePath)
         
+//        let settings = [
+//            AVSampleRateKey : NSNumber(value: Float(44100.0)),
+//            AVFormatIDKey : NSNumber(value: Int32(kAudioFormatMPEG4AAC)),
+//            AVNumberOfChannelsKey : NSNumber(value: 1),
+//            AVEncoderAudioQualityKey : NSNumber(value: Int32(AVAudioQuality.medium.rawValue))
+//        ]
+        let settings = mixer.outputFormat(forBus: 0).settings
+        do {
+            let outputFile = try AVAudioFile(forWriting: tmpFileUrl as URL, settings: settings)
+            print("[TEST] AVAudioFile created successfully.")
+            mixer.installTap(onBus: 0, bufferSize: 4096, format: nil) {
+                (buffer: AVAudioPCMBuffer?, time: AVAudioTime!) -> Void in
+//                print("TEST", buffer, time)
+                do {
+                    try outputFile.write(from: buffer!)
+                } catch {
+                    print("[ERROR] writing to file", error.localizedDescription)
+                }
+            }
+        } catch {
+            print("[ERROR] AVAudioFile file", error)
+        }
+    }
+    
+    @objc
+    private func shareButtonTapped() {
+        audioEngine.inputNode.removeTap(onBus: 0)
+        
+        let fileURL = URL(fileURLWithPath: filePath)
+                
+        // Create the Array which includes the files you want to share
+        var filesToShare = [Any]()
+                
+        // Add the path of the file to the Array
+        filesToShare.append(fileURL)
+                
+        // Make the activityViewContoller which shows the share-view
+        let activityViewController = UIActivityViewController(activityItems: filesToShare, applicationActivities: nil)
+
+        // Be notified of the result when the share sheet is dismissed
+        activityViewController.completionWithItemsHandler = { activityType, completed, returnedItems, activityError in
+            print("[TEST] file shared", completed)
+        }
+
+        // Show the share-view
+        self.present(activityViewController, animated: true, completion: nil)
     }
     
     private func loadHiHats() {
