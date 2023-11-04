@@ -86,6 +86,8 @@ class LayerEditorViewController: UIViewController {
     private let isRecording = BehaviorSubject<Bool>(value: false)
     private let isRecordingAllowed = BehaviorSubject<Bool>(value: false)
     
+    private let isPlaying = BehaviorSubject<Bool>(value: false)
+    
     private let isLayersListExpanded = BehaviorSubject<Bool>(value: false)
     
     private let newSampleSelected = PublishSubject<Sample>()
@@ -114,9 +116,9 @@ class LayerEditorViewController: UIViewController {
             audioEngine.connect(mixer, to: audioEngine.outputNode, format: nil)
             try audioEngine.start()
             
-            loadHiHats()
-            loadSnares()
-            loadKick()
+//            loadHiHats()
+//            loadSnares()
+//            loadKick()
             
             setupTrackRecording()
             
@@ -155,7 +157,7 @@ class LayerEditorViewController: UIViewController {
         share.snp.makeConstraints { make in
             make.width.height.equalTo(50)
         }
-        playButton.addTarget(self, action: #selector(toggleIsSongPlaying), for: .touchUpInside)
+        
         playButton.snp.makeConstraints { make in
             make.width.height.equalTo(50)
         }
@@ -236,6 +238,26 @@ class LayerEditorViewController: UIViewController {
             })
             .disposed(by: bag)
         
+        // play / stop
+        isPlaying
+            .map { $0 ? UIImage(systemName: "stop.fill") : UIImage(systemName: "play.fill") }
+            .bind(to: playButton.rx.image())
+            .disposed(by: bag)
+        
+        playButton.rx.tap.asObservable()
+            .withLatestFrom(isPlaying)
+            .map { !$0 }
+            .bind(to: isPlaying)
+            .disposed(by: bag)
+        
+        Observable.combineLatest(layers, isPlaying)
+            .bind { layers, isPlaying in
+                for layer in layers {
+                    layer.isPlaying.onNext(isPlaying)
+                }
+            }
+            .disposed(by: bag)
+        
         // layers list
         layersButton.rx.tap
             .withLatestFrom(isLayersListExpanded)
@@ -274,25 +296,23 @@ class LayerEditorViewController: UIViewController {
             .disposed(by: bag)
     }
     
-    private func startPlayers() {
-        do {
-            try audioEngine.start()
-            playButton.setImage(UIImage(systemName: "stop.fill"), for: .normal)
-            for player in players {
-                player.play()
-            }
-        } catch {
-            print("[ERROR] starting song", error)
-        }
-    }
+//    private func startPlayers() {
+//        do {
+//            try audioEngine.start()
+//            for player in players {
+//                player.play()
+//            }
+//        } catch {
+//            print("[ERROR] starting song", error)
+//        }
+//    }
     
-    private func stopPlayers() {
-        for player in players {
-            player.stop()
-        }
-        audioEngine.stop()
-        playButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
-    }
+//    private func stopPlayers() {
+//        for player in players {
+//            player.stop()
+//        }
+//        audioEngine.stop()
+//    }
     
     private func setupTrackRecording() {
         if (FileManager.default.createFile(atPath: filePath, contents: nil, attributes: nil)) {
@@ -327,13 +347,13 @@ class LayerEditorViewController: UIViewController {
         }
     }
     
-    @objc private func toggleIsSongPlaying() {
-        if audioEngine.isRunning {
-            stopPlayers()
-        } else {
-            startPlayers()
-        }
-    }
+//    @objc private func toggleIsSongPlaying() {
+//        if audioEngine.isRunning {
+//            stopPlayers()
+//        } else {
+//            startPlayers()
+//        }
+//    }
     
     private var recordingSession: AVAudioSession!
     private var whistleRecorder: AVAudioRecorder!
@@ -431,90 +451,90 @@ class LayerEditorViewController: UIViewController {
         self.present(activityViewController, animated: true, completion: nil)
     }
     
-    private func loadHiHats() {
-        let audioFilePlayer: AVAudioPlayerNode = AVAudioPlayerNode()
-        let samplesPerMinute: Double = 240
-        let periodLengthInSamples: Double = 60.0 / samplesPerMinute * Constants.sampleRate
-        
-        do {
-            let path = Bundle.main.path(forResource: "hihat.wav", ofType:nil)!
-            let fileURL = URL(fileURLWithPath: path)
-            let audioFile = try AVAudioFile(forReading: fileURL)
-            let audioFormat = audioFile.processingFormat
-            let audioFrameCount = AVAudioFrameCount(periodLengthInSamples)
-            let audioFileBuffer = AVAudioPCMBuffer(pcmFormat: audioFormat, frameCapacity: audioFrameCount)!
-            try audioFile.read(into: audioFileBuffer, frameCount: audioFrameCount)
-            
-            let mainMixer = mixer
-            audioEngine.attach(audioFilePlayer)
-            audioEngine.connect(audioFilePlayer, to:mainMixer, format: audioFileBuffer.format)
-            
-            Timer.scheduledTimer(withTimeInterval: 60.0 / samplesPerMinute, repeats: true) { timer in
-                audioFilePlayer.scheduleBuffer(audioFileBuffer, at: nil, options: [], completionHandler: nil)
-            }
-            
-            players.insert(audioFilePlayer)
-        } catch {
-            print(error)
-        }
-    }
-    
-    private func loadSnares() {
-        let audioFilePlayer: AVAudioPlayerNode = AVAudioPlayerNode()
-        let samplesPerMinute: Double = 60
-        let periodLengthInSamples: Double = 60.0 / samplesPerMinute * Constants.sampleRate
-        
-        do {
-            let path = Bundle.main.path(forResource: "snare.wav", ofType:nil)!
-            let fileURL = URL(fileURLWithPath: path)
-            let audioFile = try AVAudioFile(forReading: fileURL)
-            let audioFormat = audioFile.processingFormat
-            let audioFrameCount = AVAudioFrameCount(periodLengthInSamples)
-            let audioFileBuffer = AVAudioPCMBuffer(pcmFormat: audioFormat, frameCapacity: audioFrameCount)!
-            try audioFile.read(into: audioFileBuffer, frameCount: audioFrameCount)
-            
-            let mainMixer = mixer
-            audioEngine.attach(audioFilePlayer)
-            audioEngine.connect(audioFilePlayer, to:mainMixer, format: audioFileBuffer.format)
-            
-            Timer.scheduledTimer(withTimeInterval: 60.0 / samplesPerMinute, repeats: true) { timer in
-                audioFilePlayer.scheduleBuffer(audioFileBuffer, at: nil, options: [], completionHandler: nil)
-            }
-            
-            players.insert(audioFilePlayer)
-        } catch {
-            print(error)
-        }
-    }
-    
-    private func loadKick() {
-        let audioFilePlayer: AVAudioPlayerNode = AVAudioPlayerNode()
-        let samplesPerMinute: Double = 120
-        let periodLengthInSamples: Double = 60.0 / samplesPerMinute * Constants.sampleRate
-        
-        do {
-            let path = Bundle.main.path(forResource: "kick.wav", ofType:nil)!
-            let fileURL = URL(fileURLWithPath: path)
-            let audioFile = try AVAudioFile(forReading: fileURL)
-            let audioFormat = audioFile.processingFormat
-            let audioFrameCount = AVAudioFrameCount(periodLengthInSamples)
-            let audioFileBuffer = AVAudioPCMBuffer(pcmFormat: audioFormat, frameCapacity: audioFrameCount)!
-            try audioFile.read(into: audioFileBuffer, frameCount: audioFrameCount)
-            
-            let mainMixer = mixer
-            audioEngine.attach(audioFilePlayer)
-            audioEngine.connect(audioFilePlayer, to:mainMixer, format: audioFileBuffer.format)
-            
-            Timer.scheduledTimer(withTimeInterval: 60.0 / samplesPerMinute, repeats: true) { timer in
-                audioFilePlayer.scheduleBuffer(audioFileBuffer, at: nil, options: [], completionHandler: nil)
-            }
-            
-            players.insert(audioFilePlayer)
-        } catch {
-            print(error)
-        }
-    }
-    
+//    private func loadHiHats() {
+//        let audioFilePlayer: AVAudioPlayerNode = AVAudioPlayerNode()
+//        let samplesPerMinute: Double = 240
+//        let periodLengthInSamples: Double = 60.0 / samplesPerMinute * Constants.sampleRate
+//
+//        do {
+//            let path = Bundle.main.path(forResource: "hihat.wav", ofType:nil)!
+//            let fileURL = URL(fileURLWithPath: path)
+//            let audioFile = try AVAudioFile(forReading: fileURL)
+//            let audioFormat = audioFile.processingFormat
+//            let audioFrameCount = AVAudioFrameCount(periodLengthInSamples)
+//            let audioFileBuffer = AVAudioPCMBuffer(pcmFormat: audioFormat, frameCapacity: audioFrameCount)!
+//            try audioFile.read(into: audioFileBuffer, frameCount: audioFrameCount)
+//
+//            let mainMixer = mixer
+//            audioEngine.attach(audioFilePlayer)
+//            audioEngine.connect(audioFilePlayer, to:mainMixer, format: audioFileBuffer.format)
+//
+//            Timer.scheduledTimer(withTimeInterval: 60.0 / samplesPerMinute, repeats: true) { timer in
+//                audioFilePlayer.scheduleBuffer(audioFileBuffer, at: nil, options: [], completionHandler: nil)
+//            }
+//
+//            players.insert(audioFilePlayer)
+//        } catch {
+//            print(error)
+//        }
+//    }
+//
+//    private func loadSnares() {
+//        let audioFilePlayer: AVAudioPlayerNode = AVAudioPlayerNode()
+//        let samplesPerMinute: Double = 60
+//        let periodLengthInSamples: Double = 60.0 / samplesPerMinute * Constants.sampleRate
+//
+//        do {
+//            let path = Bundle.main.path(forResource: "snare.wav", ofType:nil)!
+//            let fileURL = URL(fileURLWithPath: path)
+//            let audioFile = try AVAudioFile(forReading: fileURL)
+//            let audioFormat = audioFile.processingFormat
+//            let audioFrameCount = AVAudioFrameCount(periodLengthInSamples)
+//            let audioFileBuffer = AVAudioPCMBuffer(pcmFormat: audioFormat, frameCapacity: audioFrameCount)!
+//            try audioFile.read(into: audioFileBuffer, frameCount: audioFrameCount)
+//
+//            let mainMixer = mixer
+//            audioEngine.attach(audioFilePlayer)
+//            audioEngine.connect(audioFilePlayer, to:mainMixer, format: audioFileBuffer.format)
+//
+//            Timer.scheduledTimer(withTimeInterval: 60.0 / samplesPerMinute, repeats: true) { timer in
+//                audioFilePlayer.scheduleBuffer(audioFileBuffer, at: nil, options: [], completionHandler: nil)
+//            }
+//
+//            players.insert(audioFilePlayer)
+//        } catch {
+//            print(error)
+//        }
+//    }
+//
+//    private func loadKick() {
+//        let audioFilePlayer: AVAudioPlayerNode = AVAudioPlayerNode()
+//        let samplesPerMinute: Double = 120
+//        let periodLengthInSamples: Double = 60.0 / samplesPerMinute * Constants.sampleRate
+//
+//        do {
+//            let path = Bundle.main.path(forResource: "kick.wav", ofType:nil)!
+//            let fileURL = URL(fileURLWithPath: path)
+//            let audioFile = try AVAudioFile(forReading: fileURL)
+//            let audioFormat = audioFile.processingFormat
+//            let audioFrameCount = AVAudioFrameCount(periodLengthInSamples)
+//            let audioFileBuffer = AVAudioPCMBuffer(pcmFormat: audioFormat, frameCapacity: audioFrameCount)!
+//            try audioFile.read(into: audioFileBuffer, frameCount: audioFrameCount)
+//
+//            let mainMixer = mixer
+//            audioEngine.attach(audioFilePlayer)
+//            audioEngine.connect(audioFilePlayer, to:mainMixer, format: audioFileBuffer.format)
+//
+//            Timer.scheduledTimer(withTimeInterval: 60.0 / samplesPerMinute, repeats: true) { timer in
+//                audioFilePlayer.scheduleBuffer(audioFileBuffer, at: nil, options: [], completionHandler: nil)
+//            }
+//
+//            players.insert(audioFilePlayer)
+//        } catch {
+//            print(error)
+//        }
+//    }
+//
     private func loadAudioFile(at fileURL: URL) {
         let audioFilePlayer: AVAudioPlayerNode = AVAudioPlayerNode()
 
@@ -524,13 +544,13 @@ class LayerEditorViewController: UIViewController {
             let audioFrameCount = AVAudioFrameCount(audioFile.length)
             let audioFileBuffer = AVAudioPCMBuffer(pcmFormat: audioFormat, frameCapacity: audioFrameCount)!
             try audioFile.read(into: audioFileBuffer, frameCount: audioFrameCount)
-            
+
             let mainMixer = mixer
             audioEngine.attach(audioFilePlayer)
             audioEngine.connect(audioFilePlayer, to:mainMixer, format: audioFileBuffer.format)
-            
+
             audioFilePlayer.scheduleBuffer(audioFileBuffer, at: nil, options: [.loops], completionHandler: nil)
-            
+
             players.insert(audioFilePlayer)
         } catch {
             print(error)
@@ -546,7 +566,7 @@ extension LayerEditorViewController: AVAudioRecorderDelegate {
         guard flag else { return }
         let recordedFileUrl = recorder.url
         loadAudioFile(at: recordedFileUrl)
-        startPlayers()
+//        startPlayers()
     }
 }
 

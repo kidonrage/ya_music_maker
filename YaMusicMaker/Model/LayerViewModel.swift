@@ -16,6 +16,7 @@ final class LayerViewModel {
     let isMuted = BehaviorSubject<Bool>(value: false)
     let speed = BehaviorSubject<Float>(value: Float(Constants.baseSampleTempo))
     let volume = BehaviorSubject<Float>(value: 1)
+    let isPlaying = BehaviorSubject<Bool>(value: false)
     
     private var samplePlayer: AVAudioPlayerNode!
     private var sampleBuffer: AVAudioPCMBuffer!
@@ -32,9 +33,12 @@ final class LayerViewModel {
     }
     
     private func setupBindings() {
-        speed
+        let tempo = speed
             .map { Int($0) }
             .distinctUntilChanged()
+            .share()
+        
+        tempo
             .bind { [weak self] tempo in
                 self?.setupLoop(tempo: tempo)
             }
@@ -43,6 +47,18 @@ final class LayerViewModel {
         Observable.combineLatest(volume, isMuted)
             .bind { [weak self] (updatedVolume, isMuted) in
                 self?.samplePlayer.volume = isMuted ? .zero : Float(updatedVolume)
+            }
+            .disposed(by: bag)
+        
+        Observable.combineLatest(tempo, isPlaying)
+            .bind { [weak self] tempo, isPlaying in
+                if isPlaying {
+                    self?.setupLoop(tempo: tempo)
+                    self?.samplePlayer.play()
+                } else {
+                    self?.timer?.invalidate()
+                    self?.samplePlayer.stop()
+                }
             }
             .disposed(by: bag)
     }
@@ -73,8 +89,6 @@ final class LayerViewModel {
             let audioEngine = AudioService.shared.audioEngine
             audioEngine.attach(samplePlayer)
             audioEngine.connect(samplePlayer, to: mixer, format: sampleBuffer.format)
-
-            samplePlayer.play()
         } catch {
             print("[ERROR] loading sample in layer", error)
         }
