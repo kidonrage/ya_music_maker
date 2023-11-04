@@ -13,9 +13,6 @@ import AVFoundation
 
 class LayerEditorViewController: UIViewController {
     
-    private let selectorA = SampleSelectorControl()
-    private let selectorB = SampleSelectorControl()
-    private let selectorC = SampleSelectorControl()
     private let sampleEditor = SampleEditorView()
     private let share: UIButton = {
         let button = UIButton()
@@ -59,10 +56,10 @@ class LayerEditorViewController: UIViewController {
         stackView.spacing = 16
         return stackView
     }()
-    private lazy var saplesSelectorsContainer: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [selectorA, selectorB, selectorC])
+    private let saplesSelectorsContainer: UIStackView = {
+        let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.distribution = .fillEqually
+        stackView.distribution = .equalCentering
         stackView.spacing = 24
         return stackView
     }()
@@ -75,6 +72,7 @@ class LayerEditorViewController: UIViewController {
         tableView.estimatedRowHeight = 56
         tableView.contentInset = .init(top: 5, left: .zero, bottom: 5, right: .zero)
         tableView.layer.cornerRadius = 12
+        tableView.separatorStyle = .none
         return tableView
     }()
     
@@ -89,6 +87,8 @@ class LayerEditorViewController: UIViewController {
     private let isRecordingAllowed = BehaviorSubject<Bool>(value: false)
     
     private let isLayersListExpanded = BehaviorSubject<Bool>(value: false)
+    
+    private let newSampleSelected = PublishSubject<Sample>()
     
     private var bag = DisposeBag()
     
@@ -119,7 +119,7 @@ class LayerEditorViewController: UIViewController {
             
             setupTrackRecording()
             
-            startPlayers()
+//            startPlayers()
         } catch {
             print("[TEST]", error.localizedDescription)
         }
@@ -138,9 +138,9 @@ class LayerEditorViewController: UIViewController {
         view.addSubview(controlsView)
         
         emptyLayersContainer.snp.makeConstraints { make in
-            make.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
+            make.top.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
             make.bottom.equalTo(controlsView.snp.top).inset(-16)
-            make.top.equalTo(saplesSelectorsContainer.snp.bottom).inset(-16)
+//            make.top.equalTo(saplesSelectorsContainer.snp.bottom).inset(-16)
         }
         emptyLayersLabel.snp.makeConstraints { make in
             make.edges.equalToSuperview().inset(16)
@@ -164,18 +164,34 @@ class LayerEditorViewController: UIViewController {
             make.width.height.equalTo(50)
         }
         
-        selectorA.snp.makeConstraints { make in
-            make.width.equalTo(50)
+        setupSampleSelector()
+        
+        sampleEditor.snp.makeConstraints { make in
+            make.top.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
+            make.bottom.equalTo(controlsView.snp.top).inset(-16)
+//            make.top.equalTo(saplesSelectorsContainer.snp.bottom).inset(-16)
         }
+    }
+    
+    private func setupSampleSelector() {
+        let selectorSize: CGFloat = 80
         
         saplesSelectorsContainer.snp.makeConstraints { make in
             make.top.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
+            make.height.greaterThanOrEqualTo(selectorSize)
         }
         
-        sampleEditor.snp.makeConstraints { make in
-            make.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
-            make.bottom.equalTo(controlsView.snp.top).inset(-16)
-            make.top.equalTo(saplesSelectorsContainer.snp.bottom).inset(-16)
+        let viewModels = getMockedSampleSelectorViewModels(sampleSelectedHandler: newSampleSelected.asObserver())
+        for (i, viewModel) in viewModels.enumerated() {
+            let selector = SampleSelectorControl(viewModel: viewModel)
+            saplesSelectorsContainer.addArrangedSubview(selector)
+            if i < viewModels.count - 1 {
+                saplesSelectorsContainer.addArrangedSubview(UIView())
+            }
+            
+            selector.snp.makeConstraints { make in
+                make.width.equalTo(selectorSize)
+            }
         }
     }
     
@@ -185,7 +201,7 @@ class LayerEditorViewController: UIViewController {
             layersTableView.snp.makeConstraints { make in
                 make.leading.trailing.equalTo(view.safeAreaLayoutGuide)
                 make.bottom.equalTo(controlsView.snp.top).inset(-16)
-                make.top.greaterThanOrEqualTo(saplesSelectorsContainer.snp.bottom).inset(-16)
+                make.top.greaterThanOrEqualTo(sampleEditor.snp.top)
             }
         } else {
             layersTableView.snp.makeConstraints { make in

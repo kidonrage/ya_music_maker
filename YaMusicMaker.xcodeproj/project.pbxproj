@@ -13,6 +13,9 @@
 		C6005CF22AF6A5310097B76E /* snare.wav in Resources */ = {isa = PBXBuildFile; fileRef = C6005CEE2AF6A3720097B76E /* snare.wav */; };
 		C6005CF32AF6A5330097B76E /* kick.wav in Resources */ = {isa = PBXBuildFile; fileRef = C6005CED2AF6A3710097B76E /* kick.wav */; };
 		C6005CF62AF6A6BC0097B76E /* SelfSizingTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6005CF52AF6A6BC0097B76E /* SelfSizingTableView.swift */; };
+		C6005CF82AF6D51C0097B76E /* Sample.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6005CF72AF6D51C0097B76E /* Sample.swift */; };
+		C6005CFA2AF6D6B10097B76E /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6005CF92AF6D6B10097B76E /* Constants.swift */; };
+		C6005CFC2AF6DDAE0097B76E /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6005CFB2AF6DDAE0097B76E /* AudioService.swift */; };
 		C6C6303C2AF553F600DF73AC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C6303B2AF553F600DF73AC /* AppDelegate.swift */; };
 		C6C6303E2AF553F600DF73AC /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C6303D2AF553F600DF73AC /* SceneDelegate.swift */; };
 		C6C630402AF553F600DF73AC /* LayerEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C6303F2AF553F600DF73AC /* LayerEditorViewController.swift */; };
@@ -33,6 +36,9 @@
 		C6005CEE2AF6A3720097B76E /* snare.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = snare.wav; sourceTree = "<group>"; };
 		C6005CEF2AF6A3720097B76E /* hihat.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = hihat.wav; sourceTree = "<group>"; };
 		C6005CF52AF6A6BC0097B76E /* SelfSizingTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelfSizingTableView.swift; sourceTree = "<group>"; };
+		C6005CF72AF6D51C0097B76E /* Sample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sample.swift; sourceTree = "<group>"; };
+		C6005CF92AF6D6B10097B76E /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		C6005CFB2AF6DDAE0097B76E /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
 		C6C630382AF553F600DF73AC /* YaMusicMaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YaMusicMaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6C6303B2AF553F600DF73AC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C6C6303D2AF553F600DF73AC /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -92,6 +98,7 @@
 			isa = PBXGroup;
 			children = (
 				C6C630632AF6970E00DF73AC /* Layer.swift */,
+				C6005CF72AF6D51C0097B76E /* Sample.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -125,14 +132,16 @@
 		C6C6303A2AF553F600DF73AC /* YaMusicMaker */ = {
 			isa = PBXGroup;
 			children = (
-				C6005CF42AF6A6B40097B76E /* Components */,
 				C6C6303B2AF553F600DF73AC /* AppDelegate.swift */,
+				C6005CFB2AF6DDAE0097B76E /* AudioService.swift */,
 				C6C630512AF56FCA00DF73AC /* Color.swift */,
+				C6005CF92AF6D6B10097B76E /* Constants.swift */,
 				C6C6303F2AF553F600DF73AC /* LayerEditorViewController.swift */,
 				C6005CEA2AF6A11F0097B76E /* LayerTableViewCell.swift */,
 				C6C630532AF572EF00DF73AC /* SampleEditorView.swift */,
 				C6C6304F2AF55E2300DF73AC /* SampleSelectorControl.swift */,
 				C6C6303D2AF553F600DF73AC /* SceneDelegate.swift */,
+				C6005CF42AF6A6B40097B76E /* Components */,
 				C6005CF02AF6A3900097B76E /* Model */,
 				C6005CEC2AF6A3660097B76E /* Resources */,
 			);
@@ -257,11 +266,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				C6C630642AF6970E00DF73AC /* Layer.swift in Sources */,
+				C6005CFA2AF6D6B10097B76E /* Constants.swift in Sources */,
 				C6C630402AF553F600DF73AC /* LayerEditorViewController.swift in Sources */,
 				C6C6303C2AF553F600DF73AC /* AppDelegate.swift in Sources */,
 				C6005CEB2AF6A11F0097B76E /* LayerTableViewCell.swift in Sources */,
 				C6C630502AF55E2300DF73AC /* SampleSelectorControl.swift in Sources */,
+				C6005CF82AF6D51C0097B76E /* Sample.swift in Sources */,
 				C6C630522AF56FCA00DF73AC /* Color.swift in Sources */,
+				C6005CFC2AF6DDAE0097B76E /* AudioService.swift in Sources */,
 				C6005CF62AF6A6BC0097B76E /* SelfSizingTableView.swift in Sources */,
 				C6C6303E2AF553F600DF73AC /* SceneDelegate.swift in Sources */,
 				C6C630542AF572EF00DF73AC /* SampleEditorView.swift in Sources */,
