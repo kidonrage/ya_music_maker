@@ -76,12 +76,12 @@ class LayerEditorViewController: UIViewController {
         return tableView
     }()
     
-    private let sampleRate: Double = 44100
+    let sampleSelectorPanelHeight: CGFloat = 80
     
     private let audioEngine: AVAudioEngine = AVAudioEngine()
     private let mixer = AVAudioMixerNode()
     
-    private let layers = BehaviorSubject<[Layer]>(value: [])
+    private let layers = BehaviorSubject<[LayerViewModel]>(value: [])
     
     private let isRecording = BehaviorSubject<Bool>(value: false)
     private let isRecordingAllowed = BehaviorSubject<Bool>(value: false)
@@ -89,6 +89,7 @@ class LayerEditorViewController: UIViewController {
     private let isLayersListExpanded = BehaviorSubject<Bool>(value: false)
     
     private let newSampleSelected = PublishSubject<Sample>()
+    private let currentlySelectedLayer = BehaviorSubject<LayerViewModel?>(value: nil)
     
     private var bag = DisposeBag()
     
@@ -140,7 +141,6 @@ class LayerEditorViewController: UIViewController {
         emptyLayersContainer.snp.makeConstraints { make in
             make.top.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
             make.bottom.equalTo(controlsView.snp.top).inset(-16)
-//            make.top.equalTo(saplesSelectorsContainer.snp.bottom).inset(-16)
         }
         emptyLayersLabel.snp.makeConstraints { make in
             make.edges.equalToSuperview().inset(16)
@@ -159,7 +159,7 @@ class LayerEditorViewController: UIViewController {
         playButton.snp.makeConstraints { make in
             make.width.height.equalTo(50)
         }
-//        recordMicButton.addTarget(self, action: #selector(recordMicButtonTapped), for: .touchUpInside)
+        
         recordMicButton.snp.makeConstraints { make in
             make.width.height.equalTo(50)
         }
@@ -167,18 +167,16 @@ class LayerEditorViewController: UIViewController {
         setupSampleSelector()
         
         sampleEditor.snp.makeConstraints { make in
-            make.top.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
+            make.top.equalTo(view.safeAreaLayoutGuide).inset(sampleSelectorPanelHeight + 56)
+            make.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
             make.bottom.equalTo(controlsView.snp.top).inset(-16)
-//            make.top.equalTo(saplesSelectorsContainer.snp.bottom).inset(-16)
         }
     }
     
     private func setupSampleSelector() {
-        let selectorSize: CGFloat = 80
-        
         saplesSelectorsContainer.snp.makeConstraints { make in
             make.top.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
-            make.height.greaterThanOrEqualTo(selectorSize)
+            make.height.greaterThanOrEqualTo(sampleSelectorPanelHeight)
         }
         
         let viewModels = getMockedSampleSelectorViewModels(sampleSelectedHandler: newSampleSelected.asObserver())
@@ -190,7 +188,7 @@ class LayerEditorViewController: UIViewController {
             }
             
             selector.snp.makeConstraints { make in
-                make.width.equalTo(selectorSize)
+                make.width.equalTo(sampleSelectorPanelHeight)
             }
         }
     }
@@ -212,15 +210,15 @@ class LayerEditorViewController: UIViewController {
     }
     
     private func setupBindings() {
-        let isLayersEmpty = layers
-            .map { $0.isEmpty }
+        let isLayerSelected = currentlySelectedLayer
+            .map { $0 != nil }
         
-        isLayersEmpty
-            .map { !$0 }
+        isLayerSelected
             .bind(to: emptyLayersContainer.rx.isHidden)
             .disposed(by: bag)
         
-        isLayersEmpty
+        isLayerSelected
+            .map { !$0 }
             .bind(to: sampleEditor.rx.isHidden)
             .disposed(by: bag)
         
@@ -251,6 +249,27 @@ class LayerEditorViewController: UIViewController {
                     self?.setupLayersTableConstraints(isExpanded: isExpanded)
                     self?.view.layoutIfNeeded()
                 }
+            }
+            .disposed(by: bag)
+        
+        // sample selection
+        let newLayerSelected = newSampleSelected
+            .map { LayerViewModel(sample: $0) }
+            .share()
+        
+        newLayerSelected
+            .withLatestFrom(layers) { $1 + [ $0 ] }
+            .bind(to: layers)
+            .disposed(by: bag)
+        
+        newLayerSelected
+            .bind(to: currentlySelectedLayer)
+            .disposed(by: bag)
+        
+        currentlySelectedLayer
+            .compactMap { $0 }
+            .bind { [weak self] layer in
+                self?.sampleEditor.configure(with: layer)
             }
             .disposed(by: bag)
     }
@@ -415,7 +434,7 @@ class LayerEditorViewController: UIViewController {
     private func loadHiHats() {
         let audioFilePlayer: AVAudioPlayerNode = AVAudioPlayerNode()
         let samplesPerMinute: Double = 240
-        let periodLengthInSamples: Double = 60.0 / samplesPerMinute * sampleRate
+        let periodLengthInSamples: Double = 60.0 / samplesPerMinute * Constants.sampleRate
         
         do {
             let path = Bundle.main.path(forResource: "hihat.wav", ofType:nil)!
@@ -443,7 +462,7 @@ class LayerEditorViewController: UIViewController {
     private func loadSnares() {
         let audioFilePlayer: AVAudioPlayerNode = AVAudioPlayerNode()
         let samplesPerMinute: Double = 60
-        let periodLengthInSamples: Double = 60.0 / samplesPerMinute * sampleRate
+        let periodLengthInSamples: Double = 60.0 / samplesPerMinute * Constants.sampleRate
         
         do {
             let path = Bundle.main.path(forResource: "snare.wav", ofType:nil)!
@@ -471,7 +490,7 @@ class LayerEditorViewController: UIViewController {
     private func loadKick() {
         let audioFilePlayer: AVAudioPlayerNode = AVAudioPlayerNode()
         let samplesPerMinute: Double = 120
-        let periodLengthInSamples: Double = 60.0 / samplesPerMinute * sampleRate
+        let periodLengthInSamples: Double = 60.0 / samplesPerMinute * Constants.sampleRate
         
         do {
             let path = Bundle.main.path(forResource: "kick.wav", ofType:nil)!

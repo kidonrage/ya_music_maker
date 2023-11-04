@@ -6,58 +6,37 @@
 //
 
 import UIKit
+import RxSwift
 
 final class SampleEditorView: UIControl {
     
     private var minVolume: Double = 0.0
-    private var maxVolume: Double = 2.0
-    var currentVolume: Double = 1.0 {
-        didSet {
-            let height: CGFloat = 20
-            let frame = CGRect(
-                x: self.frame.minX,
-                y: (1 - (currentVolume / (maxVolume - minVolume))) * frame.height,
-                width: height,
-                height: 90
-            )
-//            print("[TEST]", frame, frame.maxY)
-            volumeIndicator.frame = frame
-        }
-    }
+    private var maxVolume: Double = 4.0
     
-    private var minSpeed: Double = 0.25
-    private var maxSpeed: Double = 2
-    var currentSpeed: Double = 1.0 {
-        didSet {
-            let height: CGFloat = 20
-            let frame = CGRect(
-                x: (currentSpeed / (maxSpeed - minSpeed)) * frame.width,
-                y: self.frame.height - height,
-                width: 90,
-                height: height
-            )
-//            print("[TEST]", frame, frame.maxY)
-            speedIndicator.frame = frame
-            
-            sendActions(for: .valueChanged)
-        }
-    }
+    private var minTempo = Float(Constants.minTempo)
+    private var maxTempo = Float(Constants.maxTempo)
     
     private let volumeIndicator: UILabel = {
         let label = UILabel()
         label.text = "громкость"
+        label.textAlignment = .center
         label.backgroundColor = Color.green
-        label.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+//        label.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         return label
     }()
     
     private let speedIndicator: UILabel = {
         let label = UILabel()
         label.text = "скорость"
+        label.textAlignment = .center
         label.backgroundColor = Color.green
         label.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         return label
     }()
+    
+    private var viewModel: LayerViewModel!
+    
+    private var bag = DisposeBag()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -78,15 +57,59 @@ final class SampleEditorView: UIControl {
         let location = touch.location(in: self)
         
         let relativeVolume = location.y / frame.height
-        let volumeLevel = (maxVolume - minVolume) * (1 - relativeVolume)
+        let volumeLevel = maxVolume * (1 - relativeVolume)
+        let constraintedVolume = max(min(maxVolume, volumeLevel), minVolume)
         
         let relativeSpeed = location.x / frame.width
-        let speedLevel = (maxSpeed - minSpeed) * relativeSpeed
+        let speedLevel = maxTempo * Float(relativeSpeed)
+        let constraintedSpeed = max(min(maxTempo, speedLevel), minTempo)
+        
+        print(relativeVolume, volumeLevel, relativeSpeed, speedLevel)
 
-//        print("[TEST] volume level", volumeLevel)
-//        print("[TEST] speed level", speedLevel)
-        self.currentVolume = volumeLevel
-        self.currentSpeed = speedLevel
+        self.viewModel.volume.onNext(Float(constraintedVolume))
+        self.viewModel.speed.onNext(constraintedSpeed)
+    }
+    
+    func configure(with layerModel: LayerViewModel) {
+        bag = DisposeBag()
+        
+        self.viewModel = layerModel
+        
+        layerModel.speed
+            .bind(onNext: { [weak self] updatedTempo in
+                self?.updateSpeedIndicatorFrame(with: updatedTempo)
+            })
+            .disposed(by: bag)
+        
+        layerModel.volume
+            .bind { [weak self] updatedVolume in
+                self?.updateVolumeIndicatorFrame(with: updatedVolume)
+            }
+            .disposed(by: bag)
+    }
+    
+    private func updateSpeedIndicatorFrame(with updatedSpeed: Float) {
+        let height: CGFloat = 20
+        let indicatorWidth = speedIndicator.frame.width
+        let frame = CGRect(
+            x: CGFloat(((updatedSpeed - minTempo) / (self.maxTempo - self.minTempo))) * (frame.width - indicatorWidth),
+            y: frame.height - height,
+            width: 90,
+            height: height
+        )
+        self.speedIndicator.frame = frame
+    }
+        
+    private func updateVolumeIndicatorFrame(with updatedVolume: Float) {
+        let updatedVolume = Double(updatedVolume)
+        let indicatorHeight = volumeIndicator.frame.height
+        let frame = CGRect(
+            x: .zero,
+            y: (1 - (updatedVolume / (maxVolume - minVolume))) * (frame.height - indicatorHeight),
+            width: 20,
+            height: 90
+        )
+        volumeIndicator.frame = frame
     }
     
     private func setupViews() {
@@ -96,15 +119,5 @@ final class SampleEditorView: UIControl {
         
         addSubview(volumeIndicator)
         volumeIndicator.transform = CGAffineTransform(rotationAngle: -CGFloat.pi / 2)
-        
-        currentSpeed = 1
-        currentVolume = 1
-        
-//        volumeIndicator.frame = CGRect(
-//            x: <#T##Int#>,
-//            y: <#T##Int#>,
-//            width: <#T##Int#>,
-//            height: <#T##Int#>
-//        )
     }
 }

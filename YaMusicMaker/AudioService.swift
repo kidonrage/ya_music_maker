@@ -13,11 +13,12 @@ final class AudioService {
     private let _sampleToPreplay = PublishSubject<Sample>()
     lazy var sampleToPreplay = _sampleToPreplay.asObserver()
     
-    private var bag = DisposeBag()
+    let audioEngine: AVAudioEngine = AVAudioEngine()
+    let mixer = AVAudioMixerNode()
     
-    private let audioEngine: AVAudioEngine = AVAudioEngine()
-    private let mixer = AVAudioMixerNode()
-    private var samplePreplayPlayer = AVAudioPlayerNode()
+    private let samplePreplayPlayer = AVAudioPlayerNode()
+    
+    private var bag = DisposeBag()
     
     private init() {
         do {

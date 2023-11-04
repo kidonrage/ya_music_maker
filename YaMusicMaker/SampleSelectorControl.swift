@@ -7,6 +7,7 @@
 
 import UIKit
 import RxSwift
+import RxRelay
 
 final class SampleOptionButton: UIButton {
     
@@ -57,7 +58,7 @@ final class SampleSelectorControl: UIControl {
     
     private var options: [SampleOptionButton] = []
     
-    private let focusedSample = BehaviorSubject<Sample?>(value: nil)
+    private let focusedSample = BehaviorRelay<Sample?>(value: nil)
     
     private var isExpanded: Bool = false {
         didSet {
@@ -104,9 +105,8 @@ final class SampleSelectorControl: UIControl {
     
     private func setupBindings() {
         let focusedSample = focusedSample
-            .distinctUntilChanged()
-            .compactMap { $0 }
             .share()
+            .distinctUntilChanged()
         
         focusedSample
             .bind { [weak self] focusedSample in
@@ -117,6 +117,7 @@ final class SampleSelectorControl: UIControl {
             .disposed(by: bag)
         
         focusedSample
+            .compactMap { $0 }
             .bind(to: AudioService.shared.sampleToPreplay)
             .disposed(by: bag)
     }
@@ -179,15 +180,15 @@ final class SampleSelectorControl: UIControl {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         isExpanded = false
         
-        options.forEach { option in
-            option.isHighlighted = false
+        if let focusedSample = focusedSample.value {
+            viewModel.sampleSelectedHandler.onNext(focusedSample)
         }
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let focusedOption = hitTest(touch.location(in: self), with: nil) as? SampleOptionButton
-        self.focusedSample.onNext(focusedOption?.sample)
+        self.focusedSample.accept(focusedOption?.sample)
     }
     
     private func makeOptionButton(sample: Sample) -> SampleOptionButton {

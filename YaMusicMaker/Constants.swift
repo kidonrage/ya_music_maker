@@ -8,6 +8,15 @@
 import UIKit
 import RxSwift
 
+struct Constants {
+    
+    static let sampleRate: Double = 44100
+    
+    static let baseSampleTempo: Int = 120
+    static let minTempo: Int = 30
+    static let maxTempo: Int = 240
+}
+
 func getMockedSampleSelectorViewModels(sampleSelectedHandler: AnyObserver<Sample>) -> [SampleSelectorViewModel] {
     return [
         .init(
