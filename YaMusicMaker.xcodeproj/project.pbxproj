@@ -10,10 +10,15 @@
 		B4660213CE13BE1DB5EA88D1 /* Pods_YaMusicMaker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92BEB2641F76464D7F152D69 /* Pods_YaMusicMaker.framework */; };
 		C6C6303C2AF553F600DF73AC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C6303B2AF553F600DF73AC /* AppDelegate.swift */; };
 		C6C6303E2AF553F600DF73AC /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C6303D2AF553F600DF73AC /* SceneDelegate.swift */; };
-		C6C630402AF553F600DF73AC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C6303F2AF553F600DF73AC /* ViewController.swift */; };
+		C6C630402AF553F600DF73AC /* LayerEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C6303F2AF553F600DF73AC /* LayerEditorViewController.swift */; };
 		C6C630452AF553F700DF73AC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C6C630442AF553F700DF73AC /* Assets.xcassets */; };
 		C6C630482AF553F700DF73AC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C6C630462AF553F700DF73AC /* LaunchScreen.storyboard */; };
 		C6C630502AF55E2300DF73AC /* SampleSelectorControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C6304F2AF55E2300DF73AC /* SampleSelectorControl.swift */; };
+		C6C630522AF56FCA00DF73AC /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C630512AF56FCA00DF73AC /* Color.swift */; };
+		C6C630542AF572EF00DF73AC /* SampleEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C630532AF572EF00DF73AC /* SampleEditorView.swift */; };
+		C6C6305A2AF58A3A00DF73AC /* hihat.wav in Resources */ = {isa = PBXBuildFile; fileRef = C6C630592AF58A3A00DF73AC /* hihat.wav */; };
+		C6C630602AF5B59600DF73AC /* snare.wav in Resources */ = {isa = PBXBuildFile; fileRef = C6C6305F2AF5B59600DF73AC /* snare.wav */; };
+		C6C630622AF5B9FF00DF73AC /* kick.wav in Resources */ = {isa = PBXBuildFile; fileRef = C6C630612AF5B9FF00DF73AC /* kick.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,11 +28,16 @@
 		C6C630382AF553F600DF73AC /* YaMusicMaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YaMusicMaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6C6303B2AF553F600DF73AC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C6C6303D2AF553F600DF73AC /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		C6C6303F2AF553F600DF73AC /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		C6C6303F2AF553F600DF73AC /* LayerEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayerEditorViewController.swift; sourceTree = "<group>"; };
 		C6C630442AF553F700DF73AC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C6C630472AF553F700DF73AC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C6C630492AF553F700DF73AC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C6C6304F2AF55E2300DF73AC /* SampleSelectorControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleSelectorControl.swift; sourceTree = "<group>"; };
+		C6C630512AF56FCA00DF73AC /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
+		C6C630532AF572EF00DF73AC /* SampleEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleEditorView.swift; sourceTree = "<group>"; };
+		C6C630592AF58A3A00DF73AC /* hihat.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = hihat.wav; path = "../../../Downloads/Cymatics - Empire Hip Hop Sample Pack/Drums - One Shots/Hihats/Closed Hihats/hihat.wav"; sourceTree = "<group>"; };
+		C6C6305F2AF5B59600DF73AC /* snare.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = snare.wav; path = "../../../Downloads/Cymatics - Empire Hip Hop Sample Pack-2/Drums - One Shots/Snares/snare.wav"; sourceTree = "<group>"; };
+		C6C630612AF5B9FF00DF73AC /* kick.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = kick.wav; path = "../../../Downloads/Cymatics - Empire Hip Hop Sample Pack-2/Drums - One Shots/Kicks/kick.wav"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,7 +58,6 @@
 				0CC2AD1BF85DC601299C04C5 /* Pods-YaMusicMaker.debug.xcconfig */,
 				A5D545C7AC360DBEE37B36D7 /* Pods-YaMusicMaker.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -83,11 +92,16 @@
 			children = (
 				C6C6303B2AF553F600DF73AC /* AppDelegate.swift */,
 				C6C6303D2AF553F600DF73AC /* SceneDelegate.swift */,
-				C6C6303F2AF553F600DF73AC /* ViewController.swift */,
+				C6C6303F2AF553F600DF73AC /* LayerEditorViewController.swift */,
 				C6C630442AF553F700DF73AC /* Assets.xcassets */,
 				C6C630462AF553F700DF73AC /* LaunchScreen.storyboard */,
 				C6C630492AF553F700DF73AC /* Info.plist */,
 				C6C6304F2AF55E2300DF73AC /* SampleSelectorControl.swift */,
+				C6C630512AF56FCA00DF73AC /* Color.swift */,
+				C6C630532AF572EF00DF73AC /* SampleEditorView.swift */,
+				C6C630592AF58A3A00DF73AC /* hihat.wav */,
+				C6C6305F2AF5B59600DF73AC /* snare.wav */,
+				C6C630612AF5B9FF00DF73AC /* kick.wav */,
 			);
 			path = YaMusicMaker;
 			sourceTree = "<group>";
@@ -152,8 +166,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C6C630622AF5B9FF00DF73AC /* kick.wav in Resources */,
 				C6C630482AF553F700DF73AC /* LaunchScreen.storyboard in Resources */,
+				C6C630602AF5B59600DF73AC /* snare.wav in Resources */,
 				C6C630452AF553F700DF73AC /* Assets.xcassets in Resources */,
+				C6C6305A2AF58A3A00DF73AC /* hihat.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -206,10 +223,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C6C630402AF553F600DF73AC /* ViewController.swift in Sources */,
+				C6C630402AF553F600DF73AC /* LayerEditorViewController.swift in Sources */,
 				C6C6303C2AF553F600DF73AC /* AppDelegate.swift in Sources */,
 				C6C630502AF55E2300DF73AC /* SampleSelectorControl.swift in Sources */,
+				C6C630522AF56FCA00DF73AC /* Color.swift in Sources */,
 				C6C6303E2AF553F600DF73AC /* SceneDelegate.swift in Sources */,
+				C6C630542AF572EF00DF73AC /* SampleEditorView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -357,6 +376,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -386,6 +406,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
