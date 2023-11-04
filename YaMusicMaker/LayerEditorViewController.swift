@@ -7,12 +7,15 @@
 
 import UIKit
 import SnapKit
-
+import RxSwift
+import RxCocoa
 import AVFoundation
 
 class LayerEditorViewController: UIViewController {
     
-    private let control = SampleSelectorControl()
+    private let selectorA = SampleSelectorControl()
+    private let selectorB = SampleSelectorControl()
+    private let selectorC = SampleSelectorControl()
     private let sampleEditor = SampleEditorView()
     private let share: UIButton = {
         let button = UIButton()
@@ -32,20 +35,64 @@ class LayerEditorViewController: UIViewController {
         button.tintColor = .white
         return button
     }()
+    private let layersButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(systemName: "square.3.layers.3d"), for: .normal)
+        button.tintColor = .white
+        return button
+    }()
+    private let emptyLayersLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Добавьте первый слой, выбрав семпл или записав звук с микрофона"
+        label.textColor = Color.white
+        label.numberOfLines = .zero
+        label.textAlignment = .center
+        return label
+    }()
+    private let emptyLayersContainer: UIView = {
+        let view = UIView()
+        return view
+    }()
     private lazy var controlsView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [UIView(), share, playButton, recordMicButton])
+        let stackView = UIStackView(arrangedSubviews: [layersButton, UIView(), share, playButton, recordMicButton])
         stackView.axis = .horizontal
         stackView.spacing = 16
         return stackView
+    }()
+    private lazy var saplesSelectorsContainer: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [selectorA, selectorB, selectorC])
+        stackView.axis = .horizontal
+        stackView.distribution = .fillEqually
+        stackView.spacing = 24
+        return stackView
+    }()
+    
+    private lazy var layersTableView: UITableView = {
+        let tableView = SelfSizingTableView()
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.register(LayerTableViewCell.self, forCellReuseIdentifier: LayerTableViewCell.cellId)
+        tableView.estimatedRowHeight = 56
+        tableView.contentInset = .init(top: 5, left: .zero, bottom: 5, right: .zero)
+        tableView.layer.cornerRadius = 12
+        return tableView
     }()
     
     private let sampleRate: Double = 44100
     
     private let audioEngine: AVAudioEngine = AVAudioEngine()
     private let mixer = AVAudioMixerNode()
-    private var players = Set<AVAudioPlayerNode>()
     
-    private var outputBuffer = AVAudioPCMBuffer()
+    private let layers = BehaviorSubject<[Layer]>(value: [])
+    
+    private let isRecording = BehaviorSubject<Bool>(value: false)
+    private let isRecordingAllowed = BehaviorSubject<Bool>(value: false)
+    
+    private let isLayersListExpanded = BehaviorSubject<Bool>(value: false)
+    
+    private var bag = DisposeBag()
+    
+    private var players = Set<AVAudioPlayerNode>()
     
     var file: AVAudioFile?
     
@@ -54,41 +101,12 @@ class LayerEditorViewController: UIViewController {
     private lazy var filePath = libraryDirPath + "/" + fileName
 
     override func viewDidLoad() {
-        
         super.viewDidLoad()
-        view.backgroundColor = Color.black
         
-        view.addSubview(sampleEditor)
-        view.addSubview(control)
-        view.addSubview(controlsView)
+        setupUI()
+        setupBindings()
         
-        controlsView.snp.makeConstraints { make in
-            make.bottom.leading.trailing.equalTo(view.safeAreaLayoutGuide)
-        }
-        
-        share.addTarget(self, action: #selector(shareButtonTapped), for: .touchUpInside)
-        share.snp.makeConstraints { make in
-            make.width.height.equalTo(50)
-        }
-        playButton.addTarget(self, action: #selector(playButtonTapped), for: .touchUpInside)
-        playButton.snp.makeConstraints { make in
-            make.width.height.equalTo(50)
-        }
-        recordMicButton.addTarget(self, action: #selector(recordMicButtonTapped), for: .touchUpInside)
-        recordMicButton.snp.makeConstraints { make in
-            make.width.height.equalTo(50)
-        }
-        
-        control.snp.makeConstraints { make in
-            make.width.equalTo(50)
-            make.top.leading.equalTo(view.safeAreaLayoutGuide).inset(16)
-        }
-        
-        sampleEditor.snp.makeConstraints { make in
-            make.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
-            make.bottom.equalTo(controlsView.snp.top).inset(-16)
-            make.top.equalTo(view.safeAreaLayoutGuide).inset(50 + 16 + 16)
-        }
+        layersTableView.reloadData()
         
         do {
             audioEngine.attach(mixer)
@@ -109,9 +127,127 @@ class LayerEditorViewController: UIViewController {
         setupRecordingMic()
     }
     
+    private func setupUI() {
+        view.backgroundColor = Color.grayDark2
+        
+        view.addSubview(emptyLayersContainer)
+        emptyLayersContainer.addSubview(emptyLayersLabel)
+        view.addSubview(sampleEditor)
+        view.addSubview(saplesSelectorsContainer)
+        view.addSubview(layersTableView)
+        view.addSubview(controlsView)
+        
+        emptyLayersContainer.snp.makeConstraints { make in
+            make.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
+            make.bottom.equalTo(controlsView.snp.top).inset(-16)
+            make.top.equalTo(saplesSelectorsContainer.snp.bottom).inset(-16)
+        }
+        emptyLayersLabel.snp.makeConstraints { make in
+            make.edges.equalToSuperview().inset(16)
+        }
+        
+        controlsView.snp.makeConstraints { make in
+            make.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
+            make.bottom.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        share.addTarget(self, action: #selector(shareButtonTapped), for: .touchUpInside)
+        share.snp.makeConstraints { make in
+            make.width.height.equalTo(50)
+        }
+        playButton.addTarget(self, action: #selector(toggleIsSongPlaying), for: .touchUpInside)
+        playButton.snp.makeConstraints { make in
+            make.width.height.equalTo(50)
+        }
+//        recordMicButton.addTarget(self, action: #selector(recordMicButtonTapped), for: .touchUpInside)
+        recordMicButton.snp.makeConstraints { make in
+            make.width.height.equalTo(50)
+        }
+        
+        selectorA.snp.makeConstraints { make in
+            make.width.equalTo(50)
+        }
+        
+        saplesSelectorsContainer.snp.makeConstraints { make in
+            make.top.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
+        }
+        
+        sampleEditor.snp.makeConstraints { make in
+            make.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
+            make.bottom.equalTo(controlsView.snp.top).inset(-16)
+            make.top.equalTo(saplesSelectorsContainer.snp.bottom).inset(-16)
+        }
+    }
+    
+    private func setupLayersTableConstraints(isExpanded: Bool) {
+        layersTableView.snp.removeConstraints()
+        if isExpanded {
+            layersTableView.snp.makeConstraints { make in
+                make.leading.trailing.equalTo(view.safeAreaLayoutGuide)
+                make.bottom.equalTo(controlsView.snp.top).inset(-16)
+                make.top.greaterThanOrEqualTo(saplesSelectorsContainer.snp.bottom).inset(-16)
+            }
+        } else {
+            layersTableView.snp.makeConstraints { make in
+                make.leading.trailing.equalTo(view.safeAreaLayoutGuide)
+                make.top.greaterThanOrEqualTo(view.snp.bottom)
+            }
+        }
+    }
+    
+    private func setupBindings() {
+        let isLayersEmpty = layers
+            .map { $0.isEmpty }
+        
+        isLayersEmpty
+            .map { !$0 }
+            .bind(to: emptyLayersContainer.rx.isHidden)
+            .disposed(by: bag)
+        
+        isLayersEmpty
+            .bind(to: sampleEditor.rx.isHidden)
+            .disposed(by: bag)
+        
+        // recording
+        isRecordingAllowed
+            .bind(to: recordMicButton.rx.isEnabled)
+            .disposed(by: bag)
+        
+        recordMicButton.rx.tap
+            .withLatestFrom(Observable.combineLatest(isRecordingAllowed, isRecording))
+            .bind(onNext: { [weak self] values in
+                let allowed = values.0
+                let isRecording = values.1
+                self?.toggleIsRecording(isRecordingAllowed: allowed, isRecording: isRecording)
+            })
+            .disposed(by: bag)
+        
+        // layers list
+        layersButton.rx.tap
+            .withLatestFrom(isLayersListExpanded)
+            .map { !$0 }
+            .bind(to: isLayersListExpanded)
+            .disposed(by: bag)
+        
+        isLayersListExpanded
+            .bind { [weak self] isExpanded in
+                UIView.animate(withDuration: 0.25) {
+                    self?.setupLayersTableConstraints(isExpanded: isExpanded)
+                    self?.view.layoutIfNeeded()
+                }
+            }
+            .disposed(by: bag)
+    }
+    
     private func startPlayers() {
-        for player in players {
-            player.play()
+        do {
+            try audioEngine.start()
+            playButton.setImage(UIImage(systemName: "stop.fill"), for: .normal)
+            for player in players {
+                player.play()
+            }
+        } catch {
+            print("[ERROR] starting song", error)
         }
     }
     
@@ -119,6 +255,8 @@ class LayerEditorViewController: UIViewController {
         for player in players {
             player.stop()
         }
+        audioEngine.stop()
+        playButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
     }
     
     private func setupTrackRecording() {
@@ -154,26 +292,16 @@ class LayerEditorViewController: UIViewController {
         }
     }
     
-    @objc private func playButtonTapped() {
+    @objc private func toggleIsSongPlaying() {
         if audioEngine.isRunning {
             stopPlayers()
-            try! audioEngine.stop()
-            playButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
         } else {
-            try! audioEngine.start()
             startPlayers()
-            playButton.setImage(UIImage(systemName: "stop.fill"), for: .normal)
         }
     }
     
     private var recordingSession: AVAudioSession!
     private var whistleRecorder: AVAudioRecorder!
-    private var isRecording: Bool = false
-    private var isRecordingAllowed: Bool = false {
-        didSet {
-            recordMicButton.alpha = isRecordingAllowed ? 1.0 : 0.5
-        }
-    }
     
     private func setupRecordingMic() {
         recordingSession = AVAudioSession.sharedInstance()
@@ -183,16 +311,15 @@ class LayerEditorViewController: UIViewController {
             try recordingSession.setActive(true)
             recordingSession.requestRecordPermission() { [unowned self] allowed in
                 DispatchQueue.main.async {
-                    self.isRecordingAllowed = allowed
+                    self.isRecordingAllowed.onNext(allowed)
                 }
             }
         } catch {
-            isRecordingAllowed = false
+            self.isRecordingAllowed.onNext(false)
         }
     }
     
-    @objc
-    private func recordMicButtonTapped() {
+    private func toggleIsRecording(isRecordingAllowed: Bool, isRecording: Bool) {
         guard isRecordingAllowed else {
             openSettings()
             return
@@ -202,7 +329,7 @@ class LayerEditorViewController: UIViewController {
             whistleRecorder.stop()
             whistleRecorder = nil
             
-            isRecording = false
+            self.isRecording.onNext(false)
             recordMicButton.tintColor = .white
         } else {
             // start
@@ -217,7 +344,7 @@ class LayerEditorViewController: UIViewController {
                 whistleRecorder.delegate = self
                 whistleRecorder.record()
                 
-                isRecording = true
+                self.isRecording.onNext(true)
                 recordMicButton.tintColor = .red
             } catch {
                 print("[ERROR] starting recording", error.localizedDescription)
@@ -385,5 +512,23 @@ extension LayerEditorViewController: AVAudioRecorderDelegate {
         let recordedFileUrl = recorder.url
         loadAudioFile(at: recordedFileUrl)
         startPlayers()
+    }
+}
+
+extension LayerEditorViewController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 4
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let layerCell = tableView.dequeueReusableCell(withIdentifier: LayerTableViewCell.cellId) as? LayerTableViewCell else {
+            return UITableViewCell()
+        }
+        layerCell.configure()
+        return layerCell
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 56
     }
 }
