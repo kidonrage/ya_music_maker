@@ -371,6 +371,7 @@
 				DEVELOPMENT_TEAM = RNXT6P5KC8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = YaMusicMaker/Info.plist;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "We need your mic to record voice layers";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -401,6 +402,7 @@
 				DEVELOPMENT_TEAM = RNXT6P5KC8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = YaMusicMaker/Info.plist;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "We need your mic to record voice layers";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;

@@ -17,7 +17,26 @@ class LayerEditorViewController: UIViewController {
     private let share: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "square.and.arrow.up"), for: .normal)
+        button.tintColor = .white
         return button
+    }()
+    private let playButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(systemName: "play.fill"), for: .normal)
+        button.tintColor = .white
+        return button
+    }()
+    private let recordMicButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(systemName: "mic.fill"), for: .normal)
+        button.tintColor = .white
+        return button
+    }()
+    private lazy var controlsView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [UIView(), share, playButton, recordMicButton])
+        stackView.axis = .horizontal
+        stackView.spacing = 16
+        return stackView
     }()
     
     private let sampleRate: Double = 44100
@@ -41,13 +60,23 @@ class LayerEditorViewController: UIViewController {
         
         view.addSubview(sampleEditor)
         view.addSubview(control)
-        view.addSubview(share)
+        view.addSubview(controlsView)
+        
+        controlsView.snp.makeConstraints { make in
+            make.bottom.leading.trailing.equalTo(view.safeAreaLayoutGuide)
+        }
         
         share.addTarget(self, action: #selector(shareButtonTapped), for: .touchUpInside)
-        
         share.snp.makeConstraints { make in
             make.width.height.equalTo(50)
-            make.center.equalToSuperview()
+        }
+        playButton.addTarget(self, action: #selector(playButtonTapped), for: .touchUpInside)
+        playButton.snp.makeConstraints { make in
+            make.width.height.equalTo(50)
+        }
+        recordMicButton.addTarget(self, action: #selector(recordMicButtonTapped), for: .touchUpInside)
+        recordMicButton.snp.makeConstraints { make in
+            make.width.height.equalTo(50)
         }
         
         control.snp.makeConstraints { make in
@@ -56,7 +85,8 @@ class LayerEditorViewController: UIViewController {
         }
         
         sampleEditor.snp.makeConstraints { make in
-            make.bottom.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
+            make.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
+            make.bottom.equalTo(controlsView.snp.top).inset(-16)
             make.top.equalTo(view.safeAreaLayoutGuide).inset(50 + 16 + 16)
         }
         
@@ -71,11 +101,23 @@ class LayerEditorViewController: UIViewController {
             
             setupTrackRecording()
             
-            for player in players {
-                player.play()
-            }
+            startPlayers()
         } catch {
             print("[TEST]", error.localizedDescription)
+        }
+        
+        setupRecordingMic()
+    }
+    
+    private func startPlayers() {
+        for player in players {
+            player.play()
+        }
+    }
+    
+    private func stopPlayers() {
+        for player in players {
+            player.stop()
         }
     }
     
@@ -112,9 +154,100 @@ class LayerEditorViewController: UIViewController {
         }
     }
     
+    @objc private func playButtonTapped() {
+        if audioEngine.isRunning {
+            stopPlayers()
+            try! audioEngine.stop()
+            playButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
+        } else {
+            try! audioEngine.start()
+            startPlayers()
+            playButton.setImage(UIImage(systemName: "stop.fill"), for: .normal)
+        }
+    }
+    
+    private var recordingSession: AVAudioSession!
+    private var whistleRecorder: AVAudioRecorder!
+    private var isRecording: Bool = false
+    private var isRecordingAllowed: Bool = false {
+        didSet {
+            recordMicButton.alpha = isRecordingAllowed ? 1.0 : 0.5
+        }
+    }
+    
+    private func setupRecordingMic() {
+        recordingSession = AVAudioSession.sharedInstance()
+        
+        do {
+            try recordingSession.setCategory(.playAndRecord, mode: .default)
+            try recordingSession.setActive(true)
+            recordingSession.requestRecordPermission() { [unowned self] allowed in
+                DispatchQueue.main.async {
+                    self.isRecordingAllowed = allowed
+                }
+            }
+        } catch {
+            isRecordingAllowed = false
+        }
+    }
+    
+    @objc
+    private func recordMicButtonTapped() {
+        guard isRecordingAllowed else {
+            openSettings()
+            return
+        }
+        if isRecording {
+            // stop
+            whistleRecorder.stop()
+            whistleRecorder = nil
+            
+            isRecording = false
+            recordMicButton.tintColor = .white
+        } else {
+            // start
+            let audioURL = getNewRecordingURL()
+            print(audioURL.absoluteString)
+            
+            let settings = mixer.outputFormat(forBus: 0).settings
+            
+            do {
+                // 5
+                whistleRecorder = try AVAudioRecorder(url: audioURL, settings: settings)
+                whistleRecorder.delegate = self
+                whistleRecorder.record()
+                
+                isRecording = true
+                recordMicButton.tintColor = .red
+            } catch {
+                print("[ERROR] starting recording", error.localizedDescription)
+            }
+        }
+    }
+    
+    private func getDocumentsDirectory() -> URL {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        let documentsDirectory = paths[0]
+        return documentsDirectory
+    }
+    
+    private func getNewRecordingURL() -> URL {
+        return getDocumentsDirectory().appendingPathComponent(UUID().uuidString + ".m4a")
+    }
+    
+    private func openSettings() {
+        guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
+            return
+        }
+
+        if UIApplication.shared.canOpenURL(settingsUrl) {
+            UIApplication.shared.open(settingsUrl)
+        }
+    }
+    
     @objc
     private func shareButtonTapped() {
-        audioEngine.inputNode.removeTap(onBus: 0)
+        mixer.removeTap(onBus: 0)
         
         let fileURL = URL(fileURLWithPath: filePath)
                 
@@ -218,5 +351,39 @@ class LayerEditorViewController: UIViewController {
         } catch {
             print(error)
         }
+    }
+    
+    private func loadAudioFile(at fileURL: URL) {
+        let audioFilePlayer: AVAudioPlayerNode = AVAudioPlayerNode()
+
+        do {
+            let audioFile = try AVAudioFile(forReading: fileURL)
+            let audioFormat = audioFile.processingFormat
+            let audioFrameCount = AVAudioFrameCount(audioFile.length)
+            let audioFileBuffer = AVAudioPCMBuffer(pcmFormat: audioFormat, frameCapacity: audioFrameCount)!
+            try audioFile.read(into: audioFileBuffer, frameCount: audioFrameCount)
+            
+            let mainMixer = mixer
+            audioEngine.attach(audioFilePlayer)
+            audioEngine.connect(audioFilePlayer, to:mainMixer, format: audioFileBuffer.format)
+            
+            audioFilePlayer.scheduleBuffer(audioFileBuffer, at: nil, options: [.loops], completionHandler: nil)
+            
+            players.insert(audioFilePlayer)
+        } catch {
+            print(error)
+        }
+    }
+}
+
+
+extension LayerEditorViewController: AVAudioRecorderDelegate {
+    
+    func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
+        print("[TEST] recording succeeded", flag)
+        guard flag else { return }
+        let recordedFileUrl = recorder.url
+        loadAudioFile(at: recordedFileUrl)
+        startPlayers()
     }
 }
