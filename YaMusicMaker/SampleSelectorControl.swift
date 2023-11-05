@@ -182,6 +182,12 @@ final class SampleSelectorControl: UIControl {
         
         if let focusedSample = focusedSample.value {
             viewModel.sampleSelectedHandler.onNext(focusedSample)
+        } else if
+            let location = touches.first?.location(in: self),
+            bounds.contains(location),
+            let defaultSample = options.first?.sample
+        {
+            viewModel.sampleSelectedHandler.onNext(defaultSample)
         }
     }
     

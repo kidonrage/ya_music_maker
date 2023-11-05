@@ -56,6 +56,10 @@ final class SampleEditorView: UIControl {
         view.backgroundColor = Color.black
         return view
     }()
+    private let horizontalTicksImage = UIImageView()
+    private let verticalTicksImage = UIImageView()
+    
+    private var gradientLayer = CAGradientLayer()
     
     private let indicatorSize: CGSize = CGSize(width: 90, height: 20)
     private let targetViewSize: CGFloat = 24
@@ -82,6 +86,32 @@ final class SampleEditorView: UIControl {
         super.layoutSubviews()
         
         gradientLayer.frame = bounds
+        
+        verticalTicksImage.frame = CGRect(
+            origin: CGPoint(x: .zero, y: indicatorSize.width / 2),
+            size: CGSize(width: indicatorSize.height, height: frame.height - indicatorSize.width))
+        
+        generateAxisTicks(
+            minValue: CGFloat(minVolume * 10),
+            maxValue: CGFloat(maxVolume * 10),
+            littleTicksStep: 1,
+            bigTicksStep: 10,
+            imageSize: CGSize(width: frame.height, height: indicatorSize.height),
+            strokeColor: Color.black
+        ) { image in
+            self.verticalTicksImage.image = image
+        }
+        
+        generateAxisTicks(
+            minValue: CGFloat(minTempo),
+            maxValue: CGFloat(maxTempo),
+            littleTicksStep: 2,
+            bigTicksStep: 10,
+            imageSize: horizontalTicksImage.frame.size,
+            strokeColor: Color.black
+        ) { image in
+            self.horizontalTicksImage.image = image
+        }
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -100,9 +130,6 @@ final class SampleEditorView: UIControl {
         let constraintedSpeed = max(min(maxTempo, speedLevel), minTempo)
         self.viewModel?.volume.onNext(Float(constraintedVolume))
         self.viewModel?.speed.onNext(constraintedSpeed)
-    }
-    
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
     }
     
     func configure(with layerModel: LayerViewModel?) {
@@ -133,7 +160,7 @@ final class SampleEditorView: UIControl {
         let x = CGFloat(((updatedSpeed - minTempo) / (maxTempo - minTempo))) * (frame.width - indicatorWidth)
         let frame = CGRect(
             x: x,
-            y: frame.height - height,
+            y: frame.height - height - height,
             width: indicatorSize.width,
             height: height
         )
@@ -159,7 +186,7 @@ final class SampleEditorView: UIControl {
         let indicatorHeight = indicatorSize.width
         let y = (1 - (updatedVolume / (maxVolume - minVolume))) * (frame.height - indicatorHeight)
         let frame = CGRect(
-            x: .zero,
+            x: indicatorSize.height,
             y: y,
             width: indicatorSize.height,
             height: indicatorHeight
@@ -181,7 +208,49 @@ final class SampleEditorView: UIControl {
         )
     }
     
-    private var gradientLayer = CAGradientLayer()
+    private func generateAxisTicks(
+        minValue: CGFloat,
+        maxValue: CGFloat,
+        littleTicksStep: CGFloat,
+        bigTicksStep: CGFloat,
+        imageSize: CGSize,
+        strokeColor: UIColor,
+        completion: @escaping (_ image: UIImage?) -> Void
+    ) {
+        autoreleasepool {
+            UIGraphicsBeginImageContextWithOptions(imageSize, false, 0)
+            guard let context: CGContext = UIGraphicsGetCurrentContext() else {
+                completion(nil)
+                return
+            }
+            
+            let lineWidth: CGFloat = 1
+            
+            context.setLineWidth(lineWidth)
+            context.setLineJoin(.round)
+            context.setLineCap(.round)
+            context.setStrokeColor(strokeColor.cgColor)
+            
+            let tickSpacing = imageSize.width / (((maxValue - minValue) / littleTicksStep) - lineWidth)
+            
+            for index in stride(from: 0, through: maxValue - minValue, by: littleTicksStep) {
+                let x = index * tickSpacing
+                context.move(to: CGPoint(x: x, y: imageSize.height))
+                context.addLine(to: CGPoint(x: x, y: (index * littleTicksStep).truncatingRemainder(dividingBy: bigTicksStep) == .zero ? .zero : imageSize.height / 2))
+            }
+            
+            context.strokePath()
+            
+            guard let axisTicksImage = UIGraphicsGetImageFromCurrentImageContext() else {
+                UIGraphicsEndImageContext()
+                completion(nil)
+                return
+            }
+            
+            UIGraphicsEndImageContext()
+            completion(axisTicksImage)
+        }
+    }
     
     private func setupViews() {
         gradientLayer.colors = [Color.greenDark.cgColor, Color.green.cgColor]
@@ -202,5 +271,15 @@ final class SampleEditorView: UIControl {
         
         addSubview(volumeIndicator)
         volumeIndicator.transform = CGAffineTransform(rotationAngle: -CGFloat.pi / 2)
+        
+        addSubview(horizontalTicksImage)
+        horizontalTicksImage.snp.makeConstraints { make in
+            make.bottom.equalToSuperview()
+            make.leading.trailing.equalToSuperview().inset(indicatorSize.width / 2)
+            make.height.equalTo(indicatorSize.height)
+        }
+    
+        addSubview(verticalTicksImage)
+        verticalTicksImage.transform = CGAffineTransform(scaleX: -1, y: 1).rotated(by: -CGFloat.pi / 2)
     }
 }

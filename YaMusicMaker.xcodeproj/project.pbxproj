@@ -31,7 +31,7 @@
 		C6C529B52AF7C20800A2F643 /* FileManager+ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C529B42AF7C20800A2F643 /* FileManager+ext.swift */; };
 		C6C6303C2AF553F600DF73AC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C6303B2AF553F600DF73AC /* AppDelegate.swift */; };
 		C6C6303E2AF553F600DF73AC /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C6303D2AF553F600DF73AC /* SceneDelegate.swift */; };
-		C6C630402AF553F600DF73AC /* LayerEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C6303F2AF553F600DF73AC /* LayerEditorViewController.swift */; };
+		C6C630402AF553F600DF73AC /* MusicMakerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C6303F2AF553F600DF73AC /* MusicMakerViewController.swift */; };
 		C6C630452AF553F700DF73AC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C6C630442AF553F700DF73AC /* Assets.xcassets */; };
 		C6C630482AF553F700DF73AC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C6C630462AF553F700DF73AC /* LaunchScreen.storyboard */; };
 		C6C630502AF55E2300DF73AC /* SampleSelectorControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C6304F2AF55E2300DF73AC /* SampleSelectorControl.swift */; };
@@ -68,7 +68,7 @@
 		C6C630382AF553F600DF73AC /* YaMusicMaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YaMusicMaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6C6303B2AF553F600DF73AC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C6C6303D2AF553F600DF73AC /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		C6C6303F2AF553F600DF73AC /* LayerEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayerEditorViewController.swift; sourceTree = "<group>"; };
+		C6C6303F2AF553F600DF73AC /* MusicMakerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicMakerViewController.swift; sourceTree = "<group>"; };
 		C6C630442AF553F700DF73AC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C6C630472AF553F700DF73AC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C6C630492AF553F700DF73AC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -189,7 +189,7 @@
 				C6C6303B2AF553F600DF73AC /* AppDelegate.swift */,
 				C6C630512AF56FCA00DF73AC /* Color.swift */,
 				C6005CF92AF6D6B10097B76E /* Constants.swift */,
-				C6C6303F2AF553F600DF73AC /* LayerEditorViewController.swift */,
+				C6C6303F2AF553F600DF73AC /* MusicMakerViewController.swift */,
 				C6005CEA2AF6A11F0097B76E /* LayerTableViewCell.swift */,
 				C6C630532AF572EF00DF73AC /* SampleEditorView.swift */,
 				C6C6304F2AF55E2300DF73AC /* SampleSelectorControl.swift */,
@@ -328,7 +328,7 @@
 			files = (
 				C6C630642AF6970E00DF73AC /* LayerViewModel.swift in Sources */,
 				C6005CFA2AF6D6B10097B76E /* Constants.swift in Sources */,
-				C6C630402AF553F600DF73AC /* LayerEditorViewController.swift in Sources */,
+				C6C630402AF553F600DF73AC /* MusicMakerViewController.swift in Sources */,
 				C6C529B02AF7282F00A2F643 /* AudioRecordingLayerViewModel.swift in Sources */,
 				C6C6303C2AF553F600DF73AC /* AppDelegate.swift in Sources */,
 				C6C529AE2AF7124600A2F643 /* UITableViewCell+Ext.swift in Sources */,

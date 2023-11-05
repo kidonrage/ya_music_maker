@@ -1,5 +1,5 @@
 //
-//  LayerEditorViewController.swift
+//  MusicMakerViewController.swift
 //  YaMusicMaker
 //
 //  Created by Vlad Eliseev on 03.11.2023.
@@ -14,7 +14,7 @@ import RxDataSources
 
 typealias LayersListSectionModel = AnimatableSectionModel<String, LayerViewModel>
 
-class LayerEditorViewController: UIViewController {
+class MusicMakerViewController: UIViewController {
     
     // MARK: - UI Components
     
@@ -471,28 +471,18 @@ class LayerEditorViewController: UIViewController {
             .disposed(by: bag)
     }
     
-    private func shareFile(at fileURL: URL) {        
-        // Create the Array which includes the files you want to share
-        var filesToShare = [Any]()
-                
-        // Add the path of the file to the Array
-        filesToShare.append(fileURL)
-                
-        // Make the activityViewContoller which shows the share-view
-        let activityViewController = UIActivityViewController(activityItems: filesToShare, applicationActivities: nil)
-
-        // Be notified of the result when the share sheet is dismissed
-        activityViewController.completionWithItemsHandler = { activityType, completed, returnedItems, activityError in
-            print("[TEST] file shared", completed)
+    private func shareFile(at fileURL: URL) {
+        DispatchQueue.main.async {
+            var filesToShare = [Any]()
+            filesToShare.append(fileURL)
+            let activityViewController = UIActivityViewController(activityItems: filesToShare, applicationActivities: nil)
+            self.present(activityViewController, animated: true, completion: nil)
         }
-
-        // Show the share-view
-        self.present(activityViewController, animated: true, completion: nil)
     }
 }
 
 // MARK: - UITableViewDelegate
-extension LayerEditorViewController: UITableViewDelegate {
+extension MusicMakerViewController: UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 56
