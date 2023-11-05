@@ -10,6 +10,9 @@ import SnapKit
 import RxSwift
 import RxCocoa
 import AVFoundation
+import RxDataSources
+
+typealias LayersListSectionModel = AnimatableSectionModel<String, LayerViewModel>
 
 class LayerEditorViewController: UIViewController {
     
@@ -66,8 +69,6 @@ class LayerEditorViewController: UIViewController {
     
     private lazy var layersTableView: UITableView = {
         let tableView = SelfSizingTableView()
-        tableView.delegate = self
-        tableView.dataSource = self
         tableView.register(LayerTableViewCell.self, forCellReuseIdentifier: LayerTableViewCell.cellId)
         tableView.estimatedRowHeight = 56
         tableView.contentInset = .init(top: 5, left: .zero, bottom: 5, right: .zero)
@@ -92,6 +93,39 @@ class LayerEditorViewController: UIViewController {
     
     private let newSampleSelected = PublishSubject<Sample>()
     private let currentlySelectedLayer = BehaviorSubject<LayerViewModel?>(value: nil)
+    
+    private let deleteLayerHandler = PublishSubject<LayerViewModel>()
+    
+    private lazy var dataSource = RxTableViewSectionedAnimatedDataSource<LayersListSectionModel>(
+        animationConfiguration: AnimationConfiguration(
+            reloadAnimation: .none,
+            deleteAnimation: .left
+        ),
+        configureCell: configureCell
+    )
+    
+    private var configureCell: RxTableViewSectionedAnimatedDataSource<LayersListSectionModel>.ConfigureCell {
+        return { [weak self] _, tableView, indexPath, layer in
+            guard
+                let self,
+                let layerCell = tableView.dequeueReusableCell(withIdentifier: LayerTableViewCell.cellId) as? LayerTableViewCell
+            else {
+                return UITableViewCell()
+            }
+            layerCell.configure(
+                with: layer,
+                isActive: true,
+                deleteLayerHandler: .init(eventHandler: { [weak self, weak layer] event in
+                    guard
+                        case .next = event,
+                        let layer
+                    else { return }
+                    self?.deleteLayerHandler.onNext(layer)
+                })
+            )
+            return layerCell
+        }
+    }
     
     private var bag = DisposeBag()
     
@@ -136,9 +170,9 @@ class LayerEditorViewController: UIViewController {
         view.addSubview(emptyLayersContainer)
         emptyLayersContainer.addSubview(emptyLayersLabel)
         view.addSubview(sampleEditor)
-        view.addSubview(saplesSelectorsContainer)
         view.addSubview(layersTableView)
         view.addSubview(controlsView)
+        view.addSubview(saplesSelectorsContainer)
         
         emptyLayersContainer.snp.makeConstraints { make in
             make.top.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
@@ -289,10 +323,38 @@ class LayerEditorViewController: UIViewController {
             .disposed(by: bag)
         
         currentlySelectedLayer
-            .compactMap { $0 }
             .bind { [weak self] layer in
                 self?.sampleEditor.configure(with: layer)
             }
+            .disposed(by: bag)
+        
+        // layers list
+        layersTableView.rx.setDelegate(self)
+            .disposed(by: bag)
+        
+        layers
+            .map { [LayersListSectionModel(model: "", items: $0)] }
+            .bind(to: layersTableView.rx.items(dataSource: dataSource))
+            .disposed(by: bag)
+        
+        // deleting layers
+        deleteLayerHandler
+            .withLatestFrom(layers) { deletedLayer, layers in
+                var updatedLayers = layers
+                updatedLayers.removeAll { $0.identity == deletedLayer.identity }
+                return updatedLayers
+            }
+            .bind(to: layers)
+            .disposed(by: bag)
+        
+        deleteLayerHandler
+            .withLatestFrom(currentlySelectedLayer) {
+                $0.identity == $1?.identity
+            }
+            .filter { $0 }
+            .withLatestFrom(layers)
+            .map { $0.first }
+            .bind(to: currentlySelectedLayer)
             .disposed(by: bag)
     }
     
@@ -570,19 +632,8 @@ extension LayerEditorViewController: AVAudioRecorderDelegate {
     }
 }
 
-extension LayerEditorViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 4
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let layerCell = tableView.dequeueReusableCell(withIdentifier: LayerTableViewCell.cellId) as? LayerTableViewCell else {
-            return UITableViewCell()
-        }
-        layerCell.configure()
-        return layerCell
-    }
-    
+extension LayerEditorViewController: UITableViewDelegate {
+
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 56
     }

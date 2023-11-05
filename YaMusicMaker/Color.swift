@@ -16,7 +16,7 @@ struct Color {
     static let gray = UIColor(63, 63, 63, 1)
     static let grayDark = UIColor(47, 47, 47, 1)
     static let grayDark2 = UIColor(23, 23, 23, 1)
-    static let red = UIColor(243, 75, 75, 0.25)
+    static let red = UIColor(243, 75, 75)
 }
 
 extension UIColor {

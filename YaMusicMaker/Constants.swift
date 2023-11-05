@@ -18,28 +18,32 @@ struct Constants {
 }
 
 func getMockedSampleSelectorViewModels(sampleSelectedHandler: AnyObserver<Sample>) -> [SampleSelectorViewModel] {
+    let guitarIcon = UIImage(named: "guitar_icon")!
     return [
         .init(
             name: "Гитара",
-            icon: UIImage(named: "guitar_icon")!,
+            icon: guitarIcon,
             samples: [
                 .init(
                     name: "Сэмпл 1",
                     urlToFile: URL(
                         fileURLWithPath: Bundle.main.path(forResource: "hihat.wav", ofType:nil)!
-                    )
+                    ),
+                    icon: guitarIcon
                 ),
                 .init(
                     name: "Сэмпл 2",
                     urlToFile: URL(
                         fileURLWithPath: Bundle.main.path(forResource: "snare.wav", ofType:nil)!
-                    )
+                    ),
+                    icon: guitarIcon
                 ),
                 .init(
                     name: "Сэмпл 3",
                     urlToFile: URL(
                         fileURLWithPath: Bundle.main.path(forResource: "kick.wav", ofType:nil)!
-                    )
+                    ),
+                    icon: guitarIcon
                 ),
             ],
             sampleSelectedHandler: sampleSelectedHandler
@@ -52,19 +56,22 @@ func getMockedSampleSelectorViewModels(sampleSelectedHandler: AnyObserver<Sample
                     name: "Сэмпл 1",
                     urlToFile: URL(
                         fileURLWithPath: Bundle.main.path(forResource: "hihat.wav", ofType:nil)!
-                    )
+                    ),
+                    icon: guitarIcon
                 ),
                 .init(
                     name: "Сэмпл 2",
                     urlToFile: URL(
                         fileURLWithPath: Bundle.main.path(forResource: "snare.wav", ofType:nil)!
-                    )
+                    ),
+                    icon: guitarIcon
                 ),
                 .init(
                     name: "Сэмпл 3",
                     urlToFile: URL(
                         fileURLWithPath: Bundle.main.path(forResource: "kick.wav", ofType:nil)!
-                    )
+                    ),
+                    icon: guitarIcon
                 ),
             ],
             sampleSelectedHandler: sampleSelectedHandler
@@ -77,19 +84,22 @@ func getMockedSampleSelectorViewModels(sampleSelectedHandler: AnyObserver<Sample
                     name: "Сэмпл 1",
                     urlToFile: URL(
                         fileURLWithPath: Bundle.main.path(forResource: "hihat.wav", ofType:nil)!
-                    )
+                    ),
+                    icon: guitarIcon
                 ),
                 .init(
                     name: "Сэмпл 2",
                     urlToFile: URL(
                         fileURLWithPath: Bundle.main.path(forResource: "snare.wav", ofType:nil)!
-                    )
+                    ),
+                    icon: guitarIcon
                 ),
                 .init(
                     name: "Сэмпл 3",
                     urlToFile: URL(
                         fileURLWithPath: Bundle.main.path(forResource: "kick.wav", ofType:nil)!
-                    )
+                    ),
+                    icon: guitarIcon
                 ),
             ],
             sampleSelectedHandler: sampleSelectedHandler

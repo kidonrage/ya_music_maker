@@ -8,11 +8,13 @@
 import Foundation
 import AVFoundation
 import RxSwift
+import Differentiator
 
-final class LayerViewModel {
+final class LayerViewModel: IdentifiableType {
     
     let sample: Sample
     
+    let identity: String = UUID().uuidString
     let isMuted = BehaviorSubject<Bool>(value: false)
     let speed = BehaviorSubject<Float>(value: Float(Constants.baseSampleTempo))
     let volume = BehaviorSubject<Float>(value: 1)
@@ -23,13 +25,18 @@ final class LayerViewModel {
     
     private var timer: Timer?
     
-    private var bag = DisposeBag()
+    var bag = DisposeBag()
     
     init(sample: Sample) {
         self.sample = sample
         
         loadSample()
         setupBindings()
+    }
+    
+    deinit {
+        timer?.invalidate()
+        samplePlayer.stop()
     }
     
     private func setupBindings() {
@@ -92,5 +99,12 @@ final class LayerViewModel {
         } catch {
             print("[ERROR] loading sample in layer", error)
         }
+    }
+}
+
+extension LayerViewModel: Equatable {
+    
+    static func == (lhs: LayerViewModel, rhs: LayerViewModel) -> Bool {
+        lhs.identity == rhs.identity
     }
 }

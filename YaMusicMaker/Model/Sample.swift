@@ -6,14 +6,17 @@
 //
 
 import Foundation
+import UIKit
 
 struct Sample: Hashable, Equatable {
     
     let name: String
     let urlToFile: URL
+    let icon: UIImage
     
-    init(name: String, urlToFile: URL) {
+    init(name: String, urlToFile: URL, icon: UIImage) {
         self.name = name
         self.urlToFile = urlToFile
+        self.icon = icon
     }
 }

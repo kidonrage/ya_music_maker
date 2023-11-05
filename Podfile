@@ -9,5 +9,6 @@ target 'YaMusicMaker' do
   pod 'SnapKit', '~> 5.6.0'
   pod 'RxSwift', '6.6.0'
   pod 'RxCocoa', '6.6.0'
+  pod 'RxDataSources', '~> 5.0'
 
 end

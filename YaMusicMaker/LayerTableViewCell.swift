@@ -6,18 +6,13 @@
 //
 
 import UIKit
-
-extension UITableViewCell {
-    
-    static var cellId: String {
-        return String(describing: Self.self)
-    }
-}
+import RxSwift
 
 final class LayerTableViewCell: UITableViewCell {
     
     private let iconView: UIImageView = {
         let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
         return imageView
     }()
     private let nameLabel: UILabel = {
@@ -26,7 +21,6 @@ final class LayerTableViewCell: UITableViewCell {
     }()
     private let toggleMuteButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(systemName: "speaker.slash"), for: .normal)
         button.tintColor = Color.white
         button.backgroundColor = Color.grayDark
         return button
@@ -57,6 +51,8 @@ final class LayerTableViewCell: UITableViewCell {
         return stackView
     }()
     
+    private var bag = DisposeBag()
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
@@ -67,9 +63,38 @@ final class LayerTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure() {
-        iconView.image = UIImage(systemName: "mic.fill")
-        nameLabel.text = "Test Layer"
+    deinit {
+        bag = DisposeBag()
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        bag = DisposeBag()
+    }
+    
+    func configure(
+        with layerVM: LayerViewModel,
+        isActive: Bool,
+        deleteLayerHandler: AnyObserver<Void>
+    ) {
+        iconView.image = layerVM.sample.icon.withTintColor(.white)
+        nameLabel.text = layerVM.sample.name
+        
+        layerVM.isMuted
+            .map { $0 ? UIImage(systemName: "speaker.slash") : UIImage(systemName: "speaker") }
+            .bind(to: toggleMuteButton.rx.image())
+            .disposed(by: bag)
+
+        toggleMuteButton.rx.tap
+            .withLatestFrom(layerVM.isMuted)
+            .map { !$0 }
+            .bind(to: layerVM.isMuted)
+            .disposed(by: bag)
+//
+        deleteButton.rx.tap
+            .bind(to: deleteLayerHandler)
+            .disposed(by: bag)
     }
     
     private func setupUI() {

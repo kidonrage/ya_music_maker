@@ -21,7 +21,6 @@ final class SampleEditorView: UIControl {
         label.text = "громкость"
         label.textAlignment = .center
         label.backgroundColor = Color.green
-//        label.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         return label
     }()
     
@@ -30,11 +29,10 @@ final class SampleEditorView: UIControl {
         label.text = "скорость"
         label.textAlignment = .center
         label.backgroundColor = Color.green
-        label.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         return label
     }()
     
-    private var viewModel: LayerViewModel!
+    private weak var viewModel: LayerViewModel?
     
     private var bag = DisposeBag()
     
@@ -64,16 +62,20 @@ final class SampleEditorView: UIControl {
         let speedLevel = maxTempo * Float(relativeSpeed)
         let constraintedSpeed = max(min(maxTempo, speedLevel), minTempo)
         
-        print(relativeVolume, volumeLevel, relativeSpeed, speedLevel)
+//        print(relativeVolume, volumeLevel, relativeSpeed, speedLevel)
 
-        self.viewModel.volume.onNext(Float(constraintedVolume))
-        self.viewModel.speed.onNext(constraintedSpeed)
+        self.viewModel?.volume.onNext(Float(constraintedVolume))
+        self.viewModel?.speed.onNext(constraintedSpeed)
     }
     
-    func configure(with layerModel: LayerViewModel) {
+    func configure(with layerModel: LayerViewModel?) {
         bag = DisposeBag()
         
         self.viewModel = layerModel
+        
+        guard let layerModel else {
+            return
+        }
         
         layerModel.speed
             .bind(onNext: { [weak self] updatedTempo in
