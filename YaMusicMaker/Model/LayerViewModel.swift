@@ -25,7 +25,7 @@ final class LayerViewModel: IdentifiableType {
     
     private var timer: Timer?
     
-    var bag = DisposeBag()
+    private var bag = DisposeBag()
     
     init(sample: Sample) {
         self.sample = sample
@@ -43,7 +43,6 @@ final class LayerViewModel: IdentifiableType {
         let tempo = speed
             .map { Int($0) }
             .distinctUntilChanged()
-            .share()
         
         tempo
             .bind { [weak self] tempo in
