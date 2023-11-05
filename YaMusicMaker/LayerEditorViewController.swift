@@ -23,24 +23,36 @@ class LayerEditorViewController: UIViewController {
         let button = UIButton()
         button.setImage(UIImage(systemName: "record.circle"), for: .normal)
         button.tintColor = .white
+        button.backgroundColor = Color.grayDark
+        button.layer.cornerRadius = 12
         return button
     }()
     private let playButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "play.fill"), for: .normal)
         button.tintColor = .white
+        button.backgroundColor = Color.grayDark
+        button.layer.cornerRadius = 12
         return button
     }()
     private let recordMicButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "mic.fill"), for: .normal)
         button.tintColor = .white
+        button.backgroundColor = Color.grayDark
+        button.layer.cornerRadius = 12
         return button
     }()
     private let layersButton: UIButton = {
         let button = UIButton()
+        button.setTitle("Слои", for: .normal)
         button.setImage(UIImage(systemName: "square.3.layers.3d"), for: .normal)
         button.tintColor = .white
+        button.backgroundColor = Color.grayDark
+        button.layer.cornerRadius = 12
+        var configuration = UIButton.Configuration.plain()
+        configuration.imagePadding = 8
+        button.configuration = configuration
         return button
     }()
     private let emptyLayersLabel: UILabel = {
@@ -198,6 +210,11 @@ class LayerEditorViewController: UIViewController {
         
         recordMicButton.snp.makeConstraints { make in
             make.width.height.equalTo(50)
+        }
+        
+        layersButton.snp.makeConstraints { make in
+            make.height.equalTo(50)
+            make.width.equalTo(110)
         }
         
         setupSampleSelector()

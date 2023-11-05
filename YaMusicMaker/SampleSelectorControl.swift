@@ -164,7 +164,7 @@ final class SampleSelectorControl: UIControl {
         iconView.image = viewModel.icon.withTintColor(Color.white)
         iconView.contentMode = .scaleAspectFit
         iconView.snp.makeConstraints { make in
-            make.width.height.equalTo(iconContainerView).inset(12)
+            make.width.height.equalTo(iconContainerView).inset(20)
             make.center.equalTo(iconContainerView)
         }
         

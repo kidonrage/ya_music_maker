@@ -56,6 +56,8 @@ final class SampleEditorView: UIControl {
         view.backgroundColor = Color.black
         return view
     }()
+    
+    private let indicatorSize: CGSize = CGSize(width: 90, height: 20)
     private let targetViewSize: CGFloat = 24
     
     private var lastTouch: CGPoint = .zero
@@ -98,11 +100,13 @@ final class SampleEditorView: UIControl {
         
         let location = touch.location(in: self)
         
-        let relativeVolume = location.y / frame.height
+        let volumeHeight = volumeIndicator.frame.height
+        let relativeVolume = (location.y - (volumeHeight / 2)) / (frame.height - volumeHeight)
         let volumeLevel = maxVolume * (1 - relativeVolume)
         let constraintedVolume = max(min(maxVolume, volumeLevel), minVolume)
         
-        let relativeSpeed = location.x / frame.width
+        let speedIndicatorWidth = speedIndicator.frame.width
+        let relativeSpeed = (location.x - (speedIndicatorWidth / 2)) / (frame.width - speedIndicatorWidth)
         let speedLevel = minTempo + ((maxTempo - minTempo) * Float(relativeSpeed))
         let constraintedSpeed = max(min(maxTempo, speedLevel), minTempo)
         self.viewModel?.volume.onNext(Float(constraintedVolume))
@@ -135,13 +139,13 @@ final class SampleEditorView: UIControl {
     }
     
     private func updateSpeedIndicatorFrame(with updatedSpeed: Float) {
-        let height: CGFloat = 20
-        let indicatorWidth = speedIndicator.frame.width
+        let height: CGFloat = indicatorSize.height
+        let indicatorWidth = indicatorSize.width
         let x = CGFloat(((updatedSpeed - minTempo) / (maxTempo - minTempo))) * (frame.width - indicatorWidth)
         let frame = CGRect(
             x: x,
             y: frame.height - height,
-            width: 90,
+            width: indicatorSize.width,
             height: height
         )
         speedIndicator.frame = frame
@@ -163,13 +167,13 @@ final class SampleEditorView: UIControl {
         
     private func updateVolumeIndicatorFrame(with updatedVolume: Float) {
         let updatedVolume = Double(updatedVolume)
-        let indicatorHeight = volumeIndicator.frame.height
+        let indicatorHeight = indicatorSize.width
         let y = (1 - (updatedVolume / (maxVolume - minVolume))) * (frame.height - indicatorHeight)
         let frame = CGRect(
             x: .zero,
             y: y,
-            width: 20,
-            height: 90
+            width: indicatorSize.height,
+            height: indicatorHeight
         )
         volumeIndicator.frame = frame
         

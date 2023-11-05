@@ -32,7 +32,7 @@ class WaveformView: UIImageView {
             context.setLineJoin(.round)
             context.setLineCap(.round)
             
-            let maxAmplitude = samples.max() ?? 0
+            let maxAmplitude = max(samples.max() ?? 0, 0.1)
             let heightNormalizationFactor = Float(imageSize.height) / maxAmplitude / 2
             
             var x: CGFloat = 0.0
