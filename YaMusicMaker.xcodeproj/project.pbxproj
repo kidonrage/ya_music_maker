@@ -17,6 +17,7 @@
 		C6005CFA2AF6D6B10097B76E /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6005CF92AF6D6B10097B76E /* Constants.swift */; };
 		C6005CFC2AF6DDAE0097B76E /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6005CFB2AF6DDAE0097B76E /* AudioService.swift */; };
 		C6C529AE2AF7124600A2F643 /* UITableViewCell+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C529AD2AF7124600A2F643 /* UITableViewCell+Ext.swift */; };
+		C6C529B02AF7282F00A2F643 /* AudioRecordingLayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C529AF2AF7282F00A2F643 /* AudioRecordingLayerViewModel.swift */; };
 		C6C6303C2AF553F600DF73AC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C6303B2AF553F600DF73AC /* AppDelegate.swift */; };
 		C6C6303E2AF553F600DF73AC /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C6303D2AF553F600DF73AC /* SceneDelegate.swift */; };
 		C6C630402AF553F600DF73AC /* LayerEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C6303F2AF553F600DF73AC /* LayerEditorViewController.swift */; };
@@ -41,6 +42,7 @@
 		C6005CF92AF6D6B10097B76E /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		C6005CFB2AF6DDAE0097B76E /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
 		C6C529AD2AF7124600A2F643 /* UITableViewCell+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableViewCell+Ext.swift"; sourceTree = "<group>"; };
+		C6C529AF2AF7282F00A2F643 /* AudioRecordingLayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecordingLayerViewModel.swift; sourceTree = "<group>"; };
 		C6C630382AF553F600DF73AC /* YaMusicMaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YaMusicMaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6C6303B2AF553F600DF73AC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C6C6303D2AF553F600DF73AC /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -101,6 +103,7 @@
 			children = (
 				C6C630632AF6970E00DF73AC /* LayerViewModel.swift */,
 				C6005CF72AF6D51C0097B76E /* Sample.swift */,
+				C6C529AF2AF7282F00A2F643 /* AudioRecordingLayerViewModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -279,6 +282,7 @@
 				C6C630642AF6970E00DF73AC /* LayerViewModel.swift in Sources */,
 				C6005CFA2AF6D6B10097B76E /* Constants.swift in Sources */,
 				C6C630402AF553F600DF73AC /* LayerEditorViewController.swift in Sources */,
+				C6C529B02AF7282F00A2F643 /* AudioRecordingLayerViewModel.swift in Sources */,
 				C6C6303C2AF553F600DF73AC /* AppDelegate.swift in Sources */,
 				C6C529AE2AF7124600A2F643 /* UITableViewCell+Ext.swift in Sources */,
 				C6005CEB2AF6A11F0097B76E /* LayerTableViewCell.swift in Sources */,

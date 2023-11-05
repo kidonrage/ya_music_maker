@@ -63,10 +63,6 @@ final class LayerTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    deinit {
-        bag = DisposeBag()
-    }
-    
     override func prepareForReuse() {
         super.prepareForReuse()
         

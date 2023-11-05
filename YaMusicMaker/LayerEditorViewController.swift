@@ -92,6 +92,7 @@ class LayerEditorViewController: UIViewController {
     private let isLayersListExpanded = BehaviorSubject<Bool>(value: false)
     
     private let newSampleSelected = PublishSubject<Sample>()
+    private let newLayerCreated = PublishSubject<LayerViewModel>()
     private let currentlySelectedLayer = BehaviorRelay<LayerViewModel?>(value: nil)
     
     private let deleteLayerHandler = PublishSubject<LayerViewModel>()
@@ -309,16 +310,17 @@ class LayerEditorViewController: UIViewController {
             .disposed(by: bag)
         
         // sample selection
-        let newLayerSelected = newSampleSelected
+        newSampleSelected
             .map { LayerViewModel(sample: $0) }
-            .share()
+            .bind(to: newLayerCreated)
+            .disposed(by: bag)
         
-        newLayerSelected
+        newLayerCreated
             .withLatestFrom(layers) { $1 + [ $0 ] }
             .bind(to: layers)
             .disposed(by: bag)
         
-        newLayerSelected
+        newLayerCreated
             .bind(to: currentlySelectedLayer)
             .disposed(by: bag)
         
@@ -632,8 +634,12 @@ extension LayerEditorViewController: AVAudioRecorderDelegate {
         print("[TEST] recording succeeded", flag)
         guard flag else { return }
         let recordedFileUrl = recorder.url
-        loadAudioFile(at: recordedFileUrl)
-//        startPlayers()
+        let sample = Sample(
+            name: "Запись",
+            urlToFile: recordedFileUrl,
+            icon: UIImage(systemName: "music.mic")!
+        )
+        self.newLayerCreated.onNext(AudioRecordingLayerViewModel(sample: sample))
     }
 }
 

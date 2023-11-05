@@ -10,7 +10,7 @@ import AVFoundation
 import RxSwift
 import Differentiator
 
-final class LayerViewModel: IdentifiableType {
+class LayerViewModel: IdentifiableType {
     
     let sample: Sample
     
@@ -20,17 +20,22 @@ final class LayerViewModel: IdentifiableType {
     let volume = BehaviorSubject<Float>(value: 1)
     let isPlaying = BehaviorSubject<Bool>(value: false)
     
-    private var samplePlayer: AVAudioPlayerNode!
-    private var sampleBuffer: AVAudioPCMBuffer!
+    var samplePlayer: AVAudioPlayerNode
+    var sampleBuffer: AVAudioPCMBuffer!
     
-    private var timer: Timer?
+    var timer: Timer?
     
     private var bag = DisposeBag()
     
     init(sample: Sample) {
         self.sample = sample
+        self.samplePlayer = AVAudioPlayerNode()
         
-        loadSample()
+        let mixer = AudioService.shared.mixer
+        let audioEngine = AudioService.shared.audioEngine
+        audioEngine.attach(samplePlayer)
+        audioEngine.connect(samplePlayer, to: mixer, format: nil)
+        
         setupBindings()
     }
     
@@ -69,34 +74,27 @@ final class LayerViewModel: IdentifiableType {
             .disposed(by: bag)
     }
     
-    private func setupLoop(tempo: Int) {
-        let samplesPerMinute = tempo
+    func setupLoop(tempo: Int) {
         timer?.invalidate()
-        let timer = Timer(timeInterval: 60.0 / Double(samplesPerMinute), repeats: true) { [weak self] timer in
-            guard let self else { return }
-            self.samplePlayer.scheduleBuffer(self.sampleBuffer, at: nil, options: [], completionHandler: nil)
-        }
-        self.timer = timer
-        RunLoop.current.add(timer, forMode: .common)
-    }
-    
-    private func loadSample() {
+        
+        let samplesPerMinute = Double(tempo)
+        let periodLengthInSamples: Double = 60.0 / samplesPerMinute * Constants.sampleRate
+        let fileURL = sample.urlToFile
+        
         do {
-            self.samplePlayer = AVAudioPlayerNode()
-            
-            let fileURL = sample.urlToFile
             let audioFile = try AVAudioFile(forReading: fileURL)
             let audioFormat = audioFile.processingFormat
-            let audioFrameCount = AVAudioFrameCount(audioFile.length)
+            let audioFrameCount = AVAudioFrameCount(periodLengthInSamples)
             self.sampleBuffer = AVAudioPCMBuffer(pcmFormat: audioFormat, frameCapacity: audioFrameCount)
             try audioFile.read(into: sampleBuffer, frameCount: audioFrameCount)
-            
-            let mixer = AudioService.shared.mixer
-            let audioEngine = AudioService.shared.audioEngine
-            audioEngine.attach(samplePlayer)
-            audioEngine.connect(samplePlayer, to: mixer, format: sampleBuffer.format)
+            let timer = Timer(timeInterval: 60.0 / samplesPerMinute, repeats: true) { [weak self] timer in
+                guard let self else { return }
+                self.samplePlayer.scheduleBuffer(self.sampleBuffer, at: nil, options: [], completionHandler: nil)
+            }
+            self.timer = timer
+            RunLoop.current.add(timer, forMode: .common)
         } catch {
-            print("[ERROR] loading sample in layer", error)
+            print("[ERROR] erorr setting a loop", error.localizedDescription)
         }
     }
 }
