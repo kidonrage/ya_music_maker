@@ -19,6 +19,12 @@
 		C6B2DCC22AF7CCBF00C95593 /* TrackRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B2DCC12AF7CCBF00C95593 /* TrackRecorder.swift */; };
 		C6B2DCC42AF7D95C00C95593 /* UnsafeBufferPointer+ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B2DCC32AF7D95C00C95593 /* UnsafeBufferPointer+ext.swift */; };
 		C6B2DCC62AF7D97100C95593 /* WaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B2DCC52AF7D97100C95593 /* WaveformView.swift */; };
+		C6B2DCCA2AF7DDCC00C95593 /* brass3.wav in Resources */ = {isa = PBXBuildFile; fileRef = C6B2DCC72AF7DDCB00C95593 /* brass3.wav */; };
+		C6B2DCCB2AF7DDCC00C95593 /* brass1.wav in Resources */ = {isa = PBXBuildFile; fileRef = C6B2DCC82AF7DDCB00C95593 /* brass1.wav */; };
+		C6B2DCCC2AF7DDCC00C95593 /* brass2.wav in Resources */ = {isa = PBXBuildFile; fileRef = C6B2DCC92AF7DDCB00C95593 /* brass2.wav */; };
+		C6B2DCD02AF7DEC700C95593 /* piano2.wav in Resources */ = {isa = PBXBuildFile; fileRef = C6B2DCCD2AF7DEC700C95593 /* piano2.wav */; };
+		C6B2DCD12AF7DEC700C95593 /* piano1.wav in Resources */ = {isa = PBXBuildFile; fileRef = C6B2DCCE2AF7DEC700C95593 /* piano1.wav */; };
+		C6B2DCD22AF7DEC700C95593 /* piano3.wav in Resources */ = {isa = PBXBuildFile; fileRef = C6B2DCCF2AF7DEC700C95593 /* piano3.wav */; };
 		C6C529AE2AF7124600A2F643 /* UITableViewCell+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C529AD2AF7124600A2F643 /* UITableViewCell+Ext.swift */; };
 		C6C529B02AF7282F00A2F643 /* AudioRecordingLayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C529AF2AF7282F00A2F643 /* AudioRecordingLayerViewModel.swift */; };
 		C6C529B22AF7BFA500A2F643 /* MicRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C529B12AF7BFA500A2F643 /* MicRecorder.swift */; };
@@ -49,6 +55,12 @@
 		C6B2DCC12AF7CCBF00C95593 /* TrackRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackRecorder.swift; sourceTree = "<group>"; };
 		C6B2DCC32AF7D95C00C95593 /* UnsafeBufferPointer+ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UnsafeBufferPointer+ext.swift"; sourceTree = "<group>"; };
 		C6B2DCC52AF7D97100C95593 /* WaveformView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformView.swift; sourceTree = "<group>"; };
+		C6B2DCC72AF7DDCB00C95593 /* brass3.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = brass3.wav; sourceTree = "<group>"; };
+		C6B2DCC82AF7DDCB00C95593 /* brass1.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = brass1.wav; sourceTree = "<group>"; };
+		C6B2DCC92AF7DDCB00C95593 /* brass2.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = brass2.wav; sourceTree = "<group>"; };
+		C6B2DCCD2AF7DEC700C95593 /* piano2.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = piano2.wav; sourceTree = "<group>"; };
+		C6B2DCCE2AF7DEC700C95593 /* piano1.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = piano1.wav; sourceTree = "<group>"; };
+		C6B2DCCF2AF7DEC700C95593 /* piano3.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = piano3.wav; sourceTree = "<group>"; };
 		C6C529AD2AF7124600A2F643 /* UITableViewCell+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableViewCell+Ext.swift"; sourceTree = "<group>"; };
 		C6C529AF2AF7282F00A2F643 /* AudioRecordingLayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecordingLayerViewModel.swift; sourceTree = "<group>"; };
 		C6C529B12AF7BFA500A2F643 /* MicRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicRecorder.swift; sourceTree = "<group>"; };
@@ -98,6 +110,12 @@
 		C6005CEC2AF6A3660097B76E /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				C6B2DCC82AF7DDCB00C95593 /* brass1.wav */,
+				C6B2DCC92AF7DDCB00C95593 /* brass2.wav */,
+				C6B2DCC72AF7DDCB00C95593 /* brass3.wav */,
+				C6B2DCCE2AF7DEC700C95593 /* piano1.wav */,
+				C6B2DCCD2AF7DEC700C95593 /* piano2.wav */,
+				C6B2DCCF2AF7DEC700C95593 /* piano3.wav */,
 				C6C630442AF553F700DF73AC /* Assets.xcassets */,
 				C6C630462AF553F700DF73AC /* LaunchScreen.storyboard */,
 				C6C630492AF553F700DF73AC /* Info.plist */,
@@ -245,10 +263,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C6B2DCD12AF7DEC700C95593 /* piano1.wav in Resources */,
+				C6B2DCD22AF7DEC700C95593 /* piano3.wav in Resources */,
+				C6B2DCCB2AF7DDCC00C95593 /* brass1.wav in Resources */,
 				C6005CF32AF6A5330097B76E /* kick.wav in Resources */,
 				C6C630482AF553F700DF73AC /* LaunchScreen.storyboard in Resources */,
+				C6B2DCCC2AF7DDCC00C95593 /* brass2.wav in Resources */,
 				C6005CF12AF6A52E0097B76E /* hihat.wav in Resources */,
 				C6005CF22AF6A5310097B76E /* snare.wav in Resources */,
+				C6B2DCD02AF7DEC700C95593 /* piano2.wav in Resources */,
+				C6B2DCCA2AF7DDCC00C95593 /* brass3.wav in Resources */,
 				C6C630452AF553F700DF73AC /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

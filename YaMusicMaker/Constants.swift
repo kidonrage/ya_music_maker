@@ -18,88 +18,90 @@ struct Constants {
 }
 
 func getMockedSampleSelectorViewModels(sampleSelectedHandler: AnyObserver<Sample>) -> [SampleSelectorViewModel] {
-    let guitarIcon = UIImage(named: "guitar_icon")!
+    let pianoIcon = UIImage(named: "piano_icon")!
+    let drumsIcon = UIImage(named: "drums_icon")!
+    let brassIcon = UIImage(named: "brass_icon")!
     return [
         .init(
-            name: "Гитара",
-            icon: guitarIcon,
+            name: "Пианино",
+            icon: pianoIcon,
             samples: [
                 .init(
                     name: "Сэмпл 1",
                     urlToFile: URL(
-                        fileURLWithPath: Bundle.main.path(forResource: "hihat.wav", ofType:nil)!
+                        fileURLWithPath: Bundle.main.path(forResource: "piano1.wav", ofType:nil)!
                     ),
-                    icon: guitarIcon
+                    icon: pianoIcon
                 ),
                 .init(
                     name: "Сэмпл 2",
                     urlToFile: URL(
-                        fileURLWithPath: Bundle.main.path(forResource: "snare.wav", ofType:nil)!
+                        fileURLWithPath: Bundle.main.path(forResource: "piano2.wav", ofType:nil)!
                     ),
-                    icon: guitarIcon
+                    icon: pianoIcon
                 ),
                 .init(
                     name: "Сэмпл 3",
                     urlToFile: URL(
-                        fileURLWithPath: Bundle.main.path(forResource: "kick.wav", ofType:nil)!
+                        fileURLWithPath: Bundle.main.path(forResource: "piano3.wav", ofType:nil)!
                     ),
-                    icon: guitarIcon
+                    icon: pianoIcon
                 ),
             ],
             sampleSelectedHandler: sampleSelectedHandler
         ),
         .init(
-            name: "Гитара",
-            icon: UIImage(named: "guitar_icon")!,
+            name: "Барабаны",
+            icon: drumsIcon,
             samples: [
                 .init(
-                    name: "Сэмпл 1",
+                    name: "Хэт",
                     urlToFile: URL(
                         fileURLWithPath: Bundle.main.path(forResource: "hihat.wav", ofType:nil)!
                     ),
-                    icon: guitarIcon
+                    icon: drumsIcon
                 ),
                 .init(
-                    name: "Сэмпл 2",
+                    name: "Снейр",
                     urlToFile: URL(
                         fileURLWithPath: Bundle.main.path(forResource: "snare.wav", ofType:nil)!
                     ),
-                    icon: guitarIcon
+                    icon: drumsIcon
                 ),
                 .init(
-                    name: "Сэмпл 3",
+                    name: "Кик",
                     urlToFile: URL(
                         fileURLWithPath: Bundle.main.path(forResource: "kick.wav", ofType:nil)!
                     ),
-                    icon: guitarIcon
+                    icon: drumsIcon
                 ),
             ],
             sampleSelectedHandler: sampleSelectedHandler
         ),
         .init(
-            name: "Гитара",
-            icon: UIImage(named: "guitar_icon")!,
+            name: "Духовые",
+            icon: brassIcon,
             samples: [
                 .init(
                     name: "Сэмпл 1",
                     urlToFile: URL(
-                        fileURLWithPath: Bundle.main.path(forResource: "hihat.wav", ofType:nil)!
+                        fileURLWithPath: Bundle.main.path(forResource: "brass1.wav", ofType:nil)!
                     ),
-                    icon: guitarIcon
+                    icon: brassIcon
                 ),
                 .init(
                     name: "Сэмпл 2",
                     urlToFile: URL(
-                        fileURLWithPath: Bundle.main.path(forResource: "snare.wav", ofType:nil)!
+                        fileURLWithPath: Bundle.main.path(forResource: "brass2.wav", ofType:nil)!
                     ),
-                    icon: guitarIcon
+                    icon: brassIcon
                 ),
                 .init(
                     name: "Сэмпл 3",
                     urlToFile: URL(
-                        fileURLWithPath: Bundle.main.path(forResource: "kick.wav", ofType:nil)!
+                        fileURLWithPath: Bundle.main.path(forResource: "brass3.wav", ofType:nil)!
                     ),
-                    icon: guitarIcon
+                    icon: brassIcon
                 ),
             ],
             sampleSelectedHandler: sampleSelectedHandler
