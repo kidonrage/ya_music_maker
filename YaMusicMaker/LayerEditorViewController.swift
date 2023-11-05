@@ -196,8 +196,7 @@ class LayerEditorViewController: UIViewController {
         }
         
         controlsView.snp.makeConstraints { make in
-            make.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
-            make.bottom.equalTo(view.safeAreaLayoutGuide)
+            make.bottom.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
         }
         
         recordToFileButton.snp.makeConstraints { make in
@@ -235,7 +234,7 @@ class LayerEditorViewController: UIViewController {
         waveformView.clipsToBounds = true
         waveformView.contentMode = .scaleAspectFit
         waveformView.snp.makeConstraints { make in
-            make.height.equalTo(40)
+            make.height.equalTo(50)
             make.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
             make.bottom.equalTo(controlsView.snp.top).inset(-16)
         }

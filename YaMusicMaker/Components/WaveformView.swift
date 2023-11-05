@@ -7,14 +7,15 @@
 
 import UIKit
 
+// TODO: Не уверен насколько нужна пользователю визуализация звука в таком виде :)
 class WaveformView: UIImageView {
 
     func generateWaveImage(samples: UnsafeBufferPointer<Float>,
                                    imageSize: CGSize,
                                    strokeColor: UIColor,
                                    backgroundColor: UIColor,
-                                   waveWidth: CGFloat,      // Width of each wave
-                                   waveSpacing: CGFloat,    // Space between waveform items
+                                   waveWidth: CGFloat,
+                                   waveSpacing: CGFloat,
                                    completion: @escaping (_ image: UIImage?) -> Void) {
         autoreleasepool {
             UIGraphicsBeginImageContextWithOptions(imageSize, false, 0)

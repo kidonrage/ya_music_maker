@@ -84,19 +84,8 @@ final class SampleEditorView: UIControl {
         gradientLayer.frame = bounds
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first else { return }
-//        currentTouchStartPoint = touch.location(in: self)
-    }
-    
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
-//        let rawLocation = touch.location(in: self)
-//
-//        let yDifference = rawLocation.y - (currentTouchStartPoint?.y ?? .zero)
-//        print(yDifference)
-        
-//        let location = CGPoint(x: rawLocation.x, y: currentPoint.y + yDifference)
         
         let location = touch.location(in: self)
         
