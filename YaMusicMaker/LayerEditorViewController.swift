@@ -92,7 +92,7 @@ class LayerEditorViewController: UIViewController {
     private let isLayersListExpanded = BehaviorSubject<Bool>(value: false)
     
     private let newSampleSelected = PublishSubject<Sample>()
-    private let currentlySelectedLayer = BehaviorSubject<LayerViewModel?>(value: nil)
+    private let currentlySelectedLayer = BehaviorRelay<LayerViewModel?>(value: nil)
     
     private let deleteLayerHandler = PublishSubject<LayerViewModel>()
     
@@ -114,14 +114,14 @@ class LayerEditorViewController: UIViewController {
             }
             layerCell.configure(
                 with: layer,
-                isActive: true,
                 deleteLayerHandler: .init(eventHandler: { [weak self, weak layer] event in
                     guard
                         case .next = event,
                         let layer
                     else { return }
                     self?.deleteLayerHandler.onNext(layer)
-                })
+                }),
+                selectedLayer: self.currentlySelectedLayer.compactMap { $0 } .asObservable()
             )
             return layerCell
         }
@@ -330,6 +330,11 @@ class LayerEditorViewController: UIViewController {
         
         // layers list
         layersTableView.rx.setDelegate(self)
+            .disposed(by: bag)
+        
+        layersTableView.rx.itemSelected
+            .withLatestFrom(layers) { $1[$0.row] }
+            .bind(to: currentlySelectedLayer)
             .disposed(by: bag)
         
         layers

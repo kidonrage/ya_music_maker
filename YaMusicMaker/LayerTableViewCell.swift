@@ -75,8 +75,8 @@ final class LayerTableViewCell: UITableViewCell {
     
     func configure(
         with layerVM: LayerViewModel,
-        isActive: Bool,
-        deleteLayerHandler: AnyObserver<Void>
+        deleteLayerHandler: AnyObserver<Void>,
+        selectedLayer: Observable<LayerViewModel>
     ) {
         iconView.image = layerVM.sample.icon.withTintColor(.white)
         nameLabel.text = layerVM.sample.name
@@ -84,6 +84,13 @@ final class LayerTableViewCell: UITableViewCell {
         layerVM.isMuted
             .map { $0 ? UIImage(systemName: "speaker.slash") : UIImage(systemName: "speaker") }
             .bind(to: toggleMuteButton.rx.image())
+            .disposed(by: bag)
+        
+        selectedLayer
+            .map { [weak layerVM] selectedLayer in
+                selectedLayer == layerVM ? Color.green : Color.black
+            }
+            .bind(to: layerMainControlsContainer.rx.backgroundColor)
             .disposed(by: bag)
 
         toggleMuteButton.rx.tap
