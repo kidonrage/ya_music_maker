@@ -14,6 +14,7 @@ final class AudioService {
     lazy var sampleToPreplay = _sampleToPreplay.asObserver()
     
     let audioEngine: AVAudioEngine = AVAudioEngine()
+    let soundAnalysisMixer = AVAudioMixerNode()
     let mixer = AVAudioMixerNode()
     
     private let samplePreplayPlayer = AVAudioPlayerNode()
@@ -22,8 +23,10 @@ final class AudioService {
     
     private init() {
         do {
+            audioEngine.attach(soundAnalysisMixer)
+            audioEngine.connect(soundAnalysisMixer, to: audioEngine.outputNode, format: nil)
             audioEngine.attach(mixer)
-            audioEngine.connect(mixer, to: audioEngine.outputNode, format: nil)
+            audioEngine.connect(mixer, to: soundAnalysisMixer, format: nil)
             try audioEngine.start()
         } catch {
             print("[ERROR]", error)

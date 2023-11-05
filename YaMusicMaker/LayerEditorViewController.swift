@@ -16,6 +16,8 @@ typealias LayersListSectionModel = AnimatableSectionModel<String, LayerViewModel
 
 class LayerEditorViewController: UIViewController {
     
+    // MARK: - UI Components
+    
     private let sampleEditor = SampleEditorView()
     private let recordToFileButton: UIButton = {
         let button = UIButton()
@@ -66,6 +68,7 @@ class LayerEditorViewController: UIViewController {
         stackView.spacing = 24
         return stackView
     }()
+    private let waveformView = WaveformView()
     
     private lazy var layersTableView: UITableView = {
         let tableView = SelfSizingTableView()
@@ -77,8 +80,7 @@ class LayerEditorViewController: UIViewController {
         return tableView
     }()
     
-    let sampleSelectorPanelHeight: CGFloat = 80
-    
+    // MARK: - Private Properties
     private let micRecorder = MicRecorder()
     private let trackRecorder = TrackRecorder()
     
@@ -128,6 +130,17 @@ class LayerEditorViewController: UIViewController {
     }
     
     private var bag = DisposeBag()
+    
+    private let sampleSelectorPanelHeight: CGFloat = 80
+    private var waveformsize: CGSize = .zero
+    
+    // MARK: - Lifecycle
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        waveformsize = waveformView.frame.size
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -138,12 +151,26 @@ class LayerEditorViewController: UIViewController {
         layersTableView.reloadData()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        setupWaveformObserver()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        removeWaveformObserver()
+    }
+    
+    // MARK: - Private methods
+    
     private func setupUI() {
         view.backgroundColor = Color.grayDark2
         
         view.addSubview(emptyLayersContainer)
         emptyLayersContainer.addSubview(emptyLayersLabel)
         view.addSubview(sampleEditor)
+        view.addSubview(waveformView)
         view.addSubview(layersTableView)
         view.addSubview(controlsView)
         view.addSubview(saplesSelectorsContainer)
@@ -175,8 +202,23 @@ class LayerEditorViewController: UIViewController {
         
         setupSampleSelector()
         
+        setupWaveformView()
+        
         sampleEditor.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide).inset(sampleSelectorPanelHeight + 56)
+            make.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
+            make.bottom.equalTo(waveformView.snp.top).inset(-16)
+        }
+    }
+    
+    private func setupWaveformView() {
+        waveformView.layer.borderWidth = 2
+        waveformView.layer.borderColor = Color.gray.cgColor
+        waveformView.layer.cornerRadius = 12
+        waveformView.clipsToBounds = true
+        waveformView.contentMode = .scaleAspectFit
+        waveformView.snp.makeConstraints { make in
+            make.height.equalTo(40)
             make.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
             make.bottom.equalTo(controlsView.snp.top).inset(-16)
         }
@@ -216,6 +258,36 @@ class LayerEditorViewController: UIViewController {
                 make.top.greaterThanOrEqualTo(view.snp.bottom)
             }
         }
+    }
+    
+    private func setupWaveformObserver() {
+        AudioService.shared.soundAnalysisMixer.installTap(onBus: 0, bufferSize: 4096, format: nil) { [weak self] (buffer: AVAudioPCMBuffer?, time: AVAudioTime!) -> Void in
+            DispatchQueue.global().async {
+                guard
+                    let self,
+                    let buffer,
+                    let channelData = buffer.floatChannelData
+                else { return }
+                //
+                let floatArray = UnsafeBufferPointer(start: channelData[0], count: Int(buffer.frameLength))
+                
+                self.waveformView.generateWaveImage(
+                    samples: floatArray,
+                    imageSize: self.waveformsize,
+                    strokeColor: Color.green,
+                    backgroundColor: Color.grayDark2,
+                    waveWidth: 3,
+                    waveSpacing: 3) { image in
+                        DispatchQueue.main.async {
+                            self.waveformView.image = image
+                        }
+                    }
+            }
+        }
+    }
+    
+    private func removeWaveformObserver() {
+        AudioService.shared.soundAnalysisMixer.removeTap(onBus: 0)
     }
     
     private func setupBindings() {
@@ -403,6 +475,7 @@ class LayerEditorViewController: UIViewController {
     }
 }
 
+// MARK: - UITableViewDelegate
 extension LayerEditorViewController: UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
