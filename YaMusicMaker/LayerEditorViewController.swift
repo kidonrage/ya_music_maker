@@ -79,12 +79,11 @@ class LayerEditorViewController: UIViewController {
     
     let sampleSelectorPanelHeight: CGFloat = 80
     
+    private let micRecorder = MicRecorder()
+    
     private let mixer = AudioService.shared.mixer
     
     private let layers = BehaviorSubject<[LayerViewModel]>(value: [])
-    
-    private let isRecording = BehaviorSubject<Bool>(value: false)
-    private let isRecordingAllowed = BehaviorSubject<Bool>(value: false)
     
     private let isPlaying = BehaviorSubject<Bool>(value: false)
     
@@ -131,10 +130,6 @@ class LayerEditorViewController: UIViewController {
     
     private var bag = DisposeBag()
     
-    private var players = Set<AVAudioPlayerNode>()
-    
-    var file: AVAudioFile?
-    
     private let libraryDirPath = (NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0])
     private let fileName = "test.caf"
     private lazy var filePath = libraryDirPath + "/" + fileName
@@ -146,8 +141,6 @@ class LayerEditorViewController: UIViewController {
         setupBindings()
         
         layersTableView.reloadData()
-        
-        setupRecordingMic()
     }
     
     private func setupUI() {
@@ -244,17 +237,31 @@ class LayerEditorViewController: UIViewController {
             .disposed(by: bag)
         
         // recording
-        isRecordingAllowed
+        micRecorder.isRecordingAllowed
             .bind(to: recordMicButton.rx.isEnabled)
             .disposed(by: bag)
         
+        micRecorder.isRecording
+            .map { $0 ? Color.red : Color.white }
+            .bind(to: recordMicButton.rx.tintColor)
+            .disposed(by: bag)
+        
         recordMicButton.rx.tap
-            .withLatestFrom(Observable.combineLatest(isRecordingAllowed, isRecording))
+            .withLatestFrom(Observable.combineLatest(micRecorder.isRecordingAllowed, micRecorder.isRecording))
             .bind(onNext: { [weak self] values in
                 let allowed = values.0
                 let isRecording = values.1
-                self?.toggleIsRecording(isRecordingAllowed: allowed, isRecording: isRecording)
+                self?.micRecorder.toggleIsRecording(isRecordingAllowed: allowed, isCurrentlyRecording: isRecording)
             })
+            .disposed(by: bag)
+        
+        micRecorder.recordedToFile
+            .map { AudioRecordingLayerViewModel(sample: Sample(
+                name: "Запись",
+                urlToFile: $0,
+                icon: UIImage(systemName: "music.mic")!
+            )) }
+            .bind(to: newLayerCreated)
             .disposed(by: bag)
         
         // play / stop
@@ -409,78 +416,6 @@ class LayerEditorViewController: UIViewController {
         }
     }
     
-    private var recordingSession: AVAudioSession!
-    private var whistleRecorder: AVAudioRecorder!
-    
-    private func setupRecordingMic() {
-        recordingSession = AVAudioSession.sharedInstance()
-        
-        do {
-            try recordingSession.setCategory(.playAndRecord, mode: .default)
-            try recordingSession.setActive(true)
-            recordingSession.requestRecordPermission() { [unowned self] allowed in
-                DispatchQueue.main.async {
-                    self.isRecordingAllowed.onNext(allowed)
-                }
-            }
-        } catch {
-            self.isRecordingAllowed.onNext(false)
-        }
-    }
-    
-    private func toggleIsRecording(isRecordingAllowed: Bool, isRecording: Bool) {
-        guard isRecordingAllowed else {
-            openSettings()
-            return
-        }
-        if isRecording {
-            // stop
-            whistleRecorder.stop()
-            whistleRecorder = nil
-            
-            self.isRecording.onNext(false)
-            recordMicButton.tintColor = .white
-        } else {
-            // start
-            let audioURL = getNewRecordingURL()
-            print(audioURL.absoluteString)
-            
-            let settings = mixer.outputFormat(forBus: 0).settings
-            
-            do {
-                // 5
-                whistleRecorder = try AVAudioRecorder(url: audioURL, settings: settings)
-                whistleRecorder.delegate = self
-                whistleRecorder.record()
-                
-                self.isRecording.onNext(true)
-                recordMicButton.tintColor = .red
-            } catch {
-                print("[ERROR] starting recording", error.localizedDescription)
-            }
-        }
-    }
-    
-    private func getDocumentsDirectory() -> URL {
-        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        let documentsDirectory = paths[0]
-        return documentsDirectory
-    }
-    
-    private func getNewRecordingURL() -> URL {
-        return getDocumentsDirectory().appendingPathComponent(UUID().uuidString + ".m4a")
-    }
-    
-    private func openSettings() {
-        guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
-            return
-        }
-
-        if UIApplication.shared.canOpenURL(settingsUrl) {
-            UIApplication.shared.open(settingsUrl)
-        }
-    }
-    
     @objc
     private func shareButtonTapped() {
         isRecordingToFile.onNext(false)
@@ -505,22 +440,6 @@ class LayerEditorViewController: UIViewController {
 
         // Show the share-view
         self.present(activityViewController, animated: true, completion: nil)
-    }
-}
-
-
-extension LayerEditorViewController: AVAudioRecorderDelegate {
-    
-    func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
-        print("[TEST] recording succeeded", flag)
-        guard flag else { return }
-        let recordedFileUrl = recorder.url
-        let sample = Sample(
-            name: "Запись",
-            urlToFile: recordedFileUrl,
-            icon: UIImage(systemName: "music.mic")!
-        )
-        self.newLayerCreated.onNext(AudioRecordingLayerViewModel(sample: sample))
     }
 }
 

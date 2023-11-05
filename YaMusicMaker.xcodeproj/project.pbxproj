@@ -18,6 +18,8 @@
 		C6005CFC2AF6DDAE0097B76E /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6005CFB2AF6DDAE0097B76E /* AudioService.swift */; };
 		C6C529AE2AF7124600A2F643 /* UITableViewCell+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C529AD2AF7124600A2F643 /* UITableViewCell+Ext.swift */; };
 		C6C529B02AF7282F00A2F643 /* AudioRecordingLayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C529AF2AF7282F00A2F643 /* AudioRecordingLayerViewModel.swift */; };
+		C6C529B22AF7BFA500A2F643 /* MicRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C529B12AF7BFA500A2F643 /* MicRecorder.swift */; };
+		C6C529B52AF7C20800A2F643 /* FileManager+ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C529B42AF7C20800A2F643 /* FileManager+ext.swift */; };
 		C6C6303C2AF553F600DF73AC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C6303B2AF553F600DF73AC /* AppDelegate.swift */; };
 		C6C6303E2AF553F600DF73AC /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C6303D2AF553F600DF73AC /* SceneDelegate.swift */; };
 		C6C630402AF553F600DF73AC /* LayerEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C6303F2AF553F600DF73AC /* LayerEditorViewController.swift */; };
@@ -43,6 +45,8 @@
 		C6005CFB2AF6DDAE0097B76E /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
 		C6C529AD2AF7124600A2F643 /* UITableViewCell+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableViewCell+Ext.swift"; sourceTree = "<group>"; };
 		C6C529AF2AF7282F00A2F643 /* AudioRecordingLayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecordingLayerViewModel.swift; sourceTree = "<group>"; };
+		C6C529B12AF7BFA500A2F643 /* MicRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicRecorder.swift; sourceTree = "<group>"; };
+		C6C529B42AF7C20800A2F643 /* FileManager+ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileManager+ext.swift"; sourceTree = "<group>"; };
 		C6C630382AF553F600DF73AC /* YaMusicMaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YaMusicMaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6C6303B2AF553F600DF73AC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C6C6303D2AF553F600DF73AC /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -120,8 +124,18 @@
 			isa = PBXGroup;
 			children = (
 				C6C529AD2AF7124600A2F643 /* UITableViewCell+Ext.swift */,
+				C6C529B42AF7C20800A2F643 /* FileManager+ext.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		C6C529B32AF7BFAF00A2F643 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				C6005CFB2AF6DDAE0097B76E /* AudioService.swift */,
+				C6C529B12AF7BFA500A2F643 /* MicRecorder.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		C6C6302F2AF553F600DF73AC = {
@@ -146,7 +160,6 @@
 			isa = PBXGroup;
 			children = (
 				C6C6303B2AF553F600DF73AC /* AppDelegate.swift */,
-				C6005CFB2AF6DDAE0097B76E /* AudioService.swift */,
 				C6C630512AF56FCA00DF73AC /* Color.swift */,
 				C6005CF92AF6D6B10097B76E /* Constants.swift */,
 				C6C6303F2AF553F600DF73AC /* LayerEditorViewController.swift */,
@@ -158,6 +171,7 @@
 				C6C529AC2AF7123A00A2F643 /* Extensions */,
 				C6005CF02AF6A3900097B76E /* Model */,
 				C6005CEC2AF6A3660097B76E /* Resources */,
+				C6C529B32AF7BFAF00A2F643 /* Services */,
 			);
 			path = YaMusicMaker;
 			sourceTree = "<group>";
@@ -286,10 +300,12 @@
 				C6C6303C2AF553F600DF73AC /* AppDelegate.swift in Sources */,
 				C6C529AE2AF7124600A2F643 /* UITableViewCell+Ext.swift in Sources */,
 				C6005CEB2AF6A11F0097B76E /* LayerTableViewCell.swift in Sources */,
+				C6C529B52AF7C20800A2F643 /* FileManager+ext.swift in Sources */,
 				C6C630502AF55E2300DF73AC /* SampleSelectorControl.swift in Sources */,
 				C6005CF82AF6D51C0097B76E /* Sample.swift in Sources */,
 				C6C630522AF56FCA00DF73AC /* Color.swift in Sources */,
 				C6005CFC2AF6DDAE0097B76E /* AudioService.swift in Sources */,
+				C6C529B22AF7BFA500A2F643 /* MicRecorder.swift in Sources */,
 				C6005CF62AF6A6BC0097B76E /* SelfSizingTableView.swift in Sources */,
 				C6C6303E2AF553F600DF73AC /* SceneDelegate.swift in Sources */,
 				C6C630542AF572EF00DF73AC /* SampleEditorView.swift in Sources */,
