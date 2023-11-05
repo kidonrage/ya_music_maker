@@ -411,6 +411,7 @@ class LayerEditorViewController: UIViewController {
                 }
             }
             isRecordingToFile.onNext(true)
+            isPlaying.onNext(true)
         } catch {
             print("[ERROR] AVAudioFile file", error)
         }
