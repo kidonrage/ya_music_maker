@@ -80,14 +80,13 @@ class LayerEditorViewController: UIViewController {
     let sampleSelectorPanelHeight: CGFloat = 80
     
     private let micRecorder = MicRecorder()
+    private let trackRecorder = TrackRecorder()
     
     private let mixer = AudioService.shared.mixer
     
     private let layers = BehaviorSubject<[LayerViewModel]>(value: [])
     
     private let isPlaying = BehaviorSubject<Bool>(value: false)
-    
-    private let isRecordingToFile = BehaviorSubject<Bool>(value: false)
     
     private let isLayersListExpanded = BehaviorSubject<Bool>(value: false)
     
@@ -129,10 +128,6 @@ class LayerEditorViewController: UIViewController {
     }
     
     private var bag = DisposeBag()
-    
-    private let libraryDirPath = (NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0])
-    private let fileName = "test.caf"
-    private lazy var filePath = libraryDirPath + "/" + fileName
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -285,20 +280,26 @@ class LayerEditorViewController: UIViewController {
             .disposed(by: bag)
         
         // record to file
-        isRecordingToFile
+        trackRecorder.isRecording
             .map { $0 ? Color.red : Color.white }
             .bind(to: recordToFileButton.rx.tintColor)
             .disposed(by: bag)
         
+        trackRecorder.recordedSuccessfulyToFile
+            .bind { [weak self] fileURL in
+                self?.shareFile(at: fileURL)
+            }
+            .disposed(by: bag)
+        
         recordToFileButton.rx.tap
-            .withLatestFrom(isRecordingToFile)
+            .withLatestFrom(trackRecorder.isRecording)
             .bind { [weak self] isRecordingToFile in
                 if isRecordingToFile {
                     // stop & share
-                    self?.shareButtonTapped()
+                    self?.trackRecorder.stopTrackRecording()
                 } else {
                     // start
-                    self?.startTrackRecording()
+                    self?.trackRecorder.startTrackRecording()
                 }
             }
             .disposed(by: bag)
@@ -382,49 +383,7 @@ class LayerEditorViewController: UIViewController {
             .disposed(by: bag)
     }
     
-    private func startTrackRecording() {
-        if (FileManager.default.createFile(atPath: filePath, contents: nil, attributes: nil)) {
-            print("[TEST] File created successfully.")
-        } else {
-            print("[TEST] File not created.")
-        }
-        
-        let tmpFileUrl = URL(fileURLWithPath: filePath)
-        
-//        let settings = [
-//            AVSampleRateKey : NSNumber(value: Float(44100.0)),
-//            AVFormatIDKey : NSNumber(value: Int32(kAudioFormatMPEG4AAC)),
-//            AVNumberOfChannelsKey : NSNumber(value: 1),
-//            AVEncoderAudioQualityKey : NSNumber(value: Int32(AVAudioQuality.medium.rawValue))
-//        ]
-        let settings = mixer.outputFormat(forBus: 0).settings
-        do {
-            let outputFile = try AVAudioFile(forWriting: tmpFileUrl as URL, settings: settings)
-            print("[TEST] AVAudioFile created successfully.")
-            mixer.installTap(onBus: 0, bufferSize: 4096, format: nil) {
-                (buffer: AVAudioPCMBuffer?, time: AVAudioTime!) -> Void in
-//                print("TEST", buffer, time)
-                do {
-                    try outputFile.write(from: buffer!)
-                } catch {
-                    print("[ERROR] writing to file", error.localizedDescription)
-                }
-            }
-            isRecordingToFile.onNext(true)
-            isPlaying.onNext(true)
-        } catch {
-            print("[ERROR] AVAudioFile file", error)
-        }
-    }
-    
-    @objc
-    private func shareButtonTapped() {
-        isRecordingToFile.onNext(false)
-        
-        AudioService.shared.mixer.removeTap(onBus: 0)
-        
-        let fileURL = URL(fileURLWithPath: filePath)
-                
+    private func shareFile(at fileURL: URL) {        
         // Create the Array which includes the files you want to share
         var filesToShare = [Any]()
                 

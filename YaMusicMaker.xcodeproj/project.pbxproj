@@ -16,6 +16,7 @@
 		C6005CF82AF6D51C0097B76E /* Sample.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6005CF72AF6D51C0097B76E /* Sample.swift */; };
 		C6005CFA2AF6D6B10097B76E /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6005CF92AF6D6B10097B76E /* Constants.swift */; };
 		C6005CFC2AF6DDAE0097B76E /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6005CFB2AF6DDAE0097B76E /* AudioService.swift */; };
+		C6B2DCC22AF7CCBF00C95593 /* TrackRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B2DCC12AF7CCBF00C95593 /* TrackRecorder.swift */; };
 		C6C529AE2AF7124600A2F643 /* UITableViewCell+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C529AD2AF7124600A2F643 /* UITableViewCell+Ext.swift */; };
 		C6C529B02AF7282F00A2F643 /* AudioRecordingLayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C529AF2AF7282F00A2F643 /* AudioRecordingLayerViewModel.swift */; };
 		C6C529B22AF7BFA500A2F643 /* MicRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C529B12AF7BFA500A2F643 /* MicRecorder.swift */; };
@@ -43,6 +44,7 @@
 		C6005CF72AF6D51C0097B76E /* Sample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sample.swift; sourceTree = "<group>"; };
 		C6005CF92AF6D6B10097B76E /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		C6005CFB2AF6DDAE0097B76E /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
+		C6B2DCC12AF7CCBF00C95593 /* TrackRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackRecorder.swift; sourceTree = "<group>"; };
 		C6C529AD2AF7124600A2F643 /* UITableViewCell+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableViewCell+Ext.swift"; sourceTree = "<group>"; };
 		C6C529AF2AF7282F00A2F643 /* AudioRecordingLayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecordingLayerViewModel.swift; sourceTree = "<group>"; };
 		C6C529B12AF7BFA500A2F643 /* MicRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicRecorder.swift; sourceTree = "<group>"; };
@@ -134,6 +136,7 @@
 			children = (
 				C6005CFB2AF6DDAE0097B76E /* AudioService.swift */,
 				C6C529B12AF7BFA500A2F643 /* MicRecorder.swift */,
+				C6B2DCC12AF7CCBF00C95593 /* TrackRecorder.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -300,6 +303,7 @@
 				C6C6303C2AF553F600DF73AC /* AppDelegate.swift in Sources */,
 				C6C529AE2AF7124600A2F643 /* UITableViewCell+Ext.swift in Sources */,
 				C6005CEB2AF6A11F0097B76E /* LayerTableViewCell.swift in Sources */,
+				C6B2DCC22AF7CCBF00C95593 /* TrackRecorder.swift in Sources */,
 				C6C529B52AF7C20800A2F643 /* FileManager+ext.swift in Sources */,
 				C6C630502AF55E2300DF73AC /* SampleSelectorControl.swift in Sources */,
 				C6005CF82AF6D51C0097B76E /* Sample.swift in Sources */,
