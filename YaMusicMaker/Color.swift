@@ -11,6 +11,7 @@ struct Color {
     
     static let white = UIColor(255, 255, 255)
     static let green = UIColor(168, 219, 16, 1)
+    static let greenDark = UIColor(55, 74, 0, 1)
     static let black = UIColor(0, 0, 0, 1)
     static let blue = UIColor(90, 80, 226)
     static let gray = UIColor(63, 63, 63, 1)

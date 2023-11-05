@@ -18,19 +18,49 @@ final class SampleEditorView: UIControl {
     
     private let volumeIndicator: UILabel = {
         let label = UILabel()
-        label.text = "громкость"
+        label.text = "Громкость"
         label.textAlignment = .center
-        label.backgroundColor = Color.green
+        label.backgroundColor = Color.white
+        label.textColor = Color.black
+        label.layer.cornerRadius = 4
+        label.clipsToBounds = true
+        label.font = .systemFont(ofSize: 12)
         return label
     }()
     
     private let speedIndicator: UILabel = {
         let label = UILabel()
-        label.text = "скорость"
+        label.text = "Скорость"
+        label.font = .systemFont(ofSize: 12)
         label.textAlignment = .center
-        label.backgroundColor = Color.green
+        label.backgroundColor = Color.white
+        label.textColor = Color.black
+        label.clipsToBounds = true
+        label.layer.cornerRadius = 4
         return label
     }()
+    
+    private let targetView: UIView = {
+        let view = UIView()
+        view.backgroundColor = Color.white
+        view.layer.cornerRadius = 12
+        return view
+    }()
+    private let targetVerticalAxisView: UIView = {
+        let view = UIView()
+        view.backgroundColor = Color.black
+        return view
+    }()
+    private let targetHorizontalAxisView: UIView = {
+        let view = UIView()
+        view.backgroundColor = Color.black
+        return view
+    }()
+    private let targetViewSize: CGFloat = 24
+    
+    private var lastTouch: CGPoint = .zero
+    private var pointWhenTouchStarted: CGPoint?
+    private var initialTouch: CGPoint?
     
     private weak var viewModel: LayerViewModel?
     
@@ -46,12 +76,26 @@ final class SampleEditorView: UIControl {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    override func layoutSubviews() {
+        super.layoutSubviews()
         
+        gradientLayer.frame = bounds
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+//        currentTouchStartPoint = touch.location(in: self)
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
+//        let rawLocation = touch.location(in: self)
+//
+//        let yDifference = rawLocation.y - (currentTouchStartPoint?.y ?? .zero)
+//        print(yDifference)
+        
+//        let location = CGPoint(x: rawLocation.x, y: currentPoint.y + yDifference)
+        
         let location = touch.location(in: self)
         
         let relativeVolume = location.y / frame.height
@@ -59,13 +103,13 @@ final class SampleEditorView: UIControl {
         let constraintedVolume = max(min(maxVolume, volumeLevel), minVolume)
         
         let relativeSpeed = location.x / frame.width
-        let speedLevel = maxTempo * Float(relativeSpeed)
+        let speedLevel = minTempo + ((maxTempo - minTempo) * Float(relativeSpeed))
         let constraintedSpeed = max(min(maxTempo, speedLevel), minTempo)
-        
-//        print(relativeVolume, volumeLevel, relativeSpeed, speedLevel)
-
         self.viewModel?.volume.onNext(Float(constraintedVolume))
         self.viewModel?.speed.onNext(constraintedSpeed)
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
     }
     
     func configure(with layerModel: LayerViewModel?) {
@@ -93,29 +137,73 @@ final class SampleEditorView: UIControl {
     private func updateSpeedIndicatorFrame(with updatedSpeed: Float) {
         let height: CGFloat = 20
         let indicatorWidth = speedIndicator.frame.width
+        let x = CGFloat(((updatedSpeed - minTempo) / (maxTempo - minTempo))) * (frame.width - indicatorWidth)
         let frame = CGRect(
-            x: CGFloat(((updatedSpeed - minTempo) / (self.maxTempo - self.minTempo))) * (frame.width - indicatorWidth),
+            x: x,
             y: frame.height - height,
             width: 90,
             height: height
         )
-        self.speedIndicator.frame = frame
+        speedIndicator.frame = frame
+        
+        targetView.frame = CGRect(
+            x: x + (indicatorWidth / 2) - targetViewSize / 2,
+            y: targetView.frame.origin.y,
+            width: targetViewSize,
+            height: targetViewSize
+        )
+        targetVerticalAxisView.frame = CGRect(
+            origin: CGPoint(
+                x: targetView.frame.origin.x + targetViewSize / 2,
+                y: .zero
+            ),
+            size: CGSize(width: 1, height: self.frame.height)
+        )
     }
         
     private func updateVolumeIndicatorFrame(with updatedVolume: Float) {
         let updatedVolume = Double(updatedVolume)
         let indicatorHeight = volumeIndicator.frame.height
+        let y = (1 - (updatedVolume / (maxVolume - minVolume))) * (frame.height - indicatorHeight)
         let frame = CGRect(
             x: .zero,
-            y: (1 - (updatedVolume / (maxVolume - minVolume))) * (frame.height - indicatorHeight),
+            y: y,
             width: 20,
             height: 90
         )
         volumeIndicator.frame = frame
+        
+        targetView.frame = CGRect(
+            x: targetView.frame.origin.x,
+            y: y + (indicatorHeight / 2) - targetViewSize / 2,
+            width: targetViewSize,
+            height: targetViewSize
+        )
+        targetHorizontalAxisView.frame = CGRect(
+            origin: CGPoint(
+                x: .zero,
+                y: targetView.frame.origin.y + targetViewSize / 2
+            ),
+            size: CGSize(width: self.frame.width, height: 1)
+        )
     }
     
+    private var gradientLayer = CAGradientLayer()
+    
     private func setupViews() {
-        backgroundColor = Color.blue
+        gradientLayer.colors = [Color.greenDark.cgColor, Color.green.cgColor]
+        gradientLayer.locations = [0.0, 1.0]
+        gradientLayer.startPoint = CGPoint(x: 0.0, y: 1.0)
+        gradientLayer.endPoint = CGPoint(x: 1.0, y: 0.0)
+        
+        layer.insertSublayer(gradientLayer, at:0)
+        
+        layer.cornerRadius = 12
+        layer.masksToBounds = true
+        
+        addSubview(targetHorizontalAxisView)
+        addSubview(targetVerticalAxisView)
+        addSubview(targetView)
         
         addSubview(speedIndicator)
         

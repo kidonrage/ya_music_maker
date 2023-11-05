@@ -74,7 +74,7 @@ final class LayerTableViewCell: UITableViewCell {
         deleteLayerHandler: AnyObserver<Void>,
         selectedLayer: Observable<LayerViewModel>
     ) {
-        iconView.image = layerVM.sample.icon.withTintColor(.white)
+        iconView.image = layerVM.sample.icon.withRenderingMode(.alwaysTemplate)
         nameLabel.text = layerVM.sample.name
         
         layerVM.isMuted
@@ -87,6 +87,17 @@ final class LayerTableViewCell: UITableViewCell {
                 selectedLayer == layerVM ? Color.green : Color.black
             }
             .bind(to: layerMainControlsContainer.rx.backgroundColor)
+            .disposed(by: bag)
+        
+        let tintColor = selectedLayer
+            .map { [weak layerVM] selectedLayer in
+                selectedLayer == layerVM ? Color.black : Color.white
+            }
+        tintColor
+            .bind(to: iconView.rx.tintColor)
+            .disposed(by: bag)
+        tintColor
+            .bind(to: nameLabel.rx.textColor)
             .disposed(by: bag)
 
         toggleMuteButton.rx.tap
