@@ -5,8 +5,8 @@
 //  Created by Vlad Eliseev on 04.11.2023.
 //
 
-import Foundation
 import AVFoundation
+import RxRelay
 import RxSwift
 import Differentiator
 
@@ -15,9 +15,9 @@ class LayerViewModel: IdentifiableType {
     let sample: Sample
     
     let identity: String = UUID().uuidString
-    let isMuted = BehaviorSubject<Bool>(value: false)
-    let speed = BehaviorSubject<Float>(value: Float(Constants.baseSampleTempo))
-    let volume = BehaviorSubject<Float>(value: 1)
+    let isMuted = BehaviorRelay<Bool>(value: false)
+    let speed = BehaviorRelay<Float>(value: Float(Constants.baseSampleTempo))
+    let volume = BehaviorRelay<Float>(value: 1)
     let isPlaying = BehaviorSubject<Bool>(value: false)
     
     var samplePlayer: AVAudioPlayerNode

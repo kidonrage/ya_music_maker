@@ -128,8 +128,8 @@ final class SampleEditorView: UIControl {
         let relativeSpeed = (location.x - (speedIndicatorWidth / 2)) / (frame.width - speedIndicatorWidth)
         let speedLevel = minTempo + ((maxTempo - minTempo) * Float(relativeSpeed))
         let constraintedSpeed = max(min(maxTempo, speedLevel), minTempo)
-        self.viewModel?.volume.onNext(Float(constraintedVolume))
-        self.viewModel?.speed.onNext(constraintedSpeed)
+        self.viewModel?.volume.accept(Float(constraintedVolume))
+        self.viewModel?.speed.accept(constraintedSpeed)
     }
     
     func configure(with layerModel: LayerViewModel?) {
@@ -178,6 +178,23 @@ final class SampleEditorView: UIControl {
                 y: .zero
             ),
             size: CGSize(width: 1, height: self.frame.height)
+        )
+    }
+    
+    private func getSampleFrameOnVisualizerCoords(
+        targetViewSize: CGSize,
+        updatedSpeed: Float,
+        updatedVolume: Float
+    ) -> CGRect {
+        let x = CGFloat(((updatedSpeed - minTempo) / (maxTempo - minTempo))) * frame.width
+        let volumeScale = maxVolume - minVolume
+        let y = (1 - (Double(updatedVolume) / volumeScale)) * frame.height
+
+        return CGRect(
+            x: x - targetViewSize.width / 2,
+            y: y - targetViewSize.height / 2,
+            width: targetViewSize.width,
+            height: targetViewSize.height
         )
     }
         

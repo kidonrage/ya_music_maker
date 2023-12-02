@@ -43,6 +43,14 @@ class MusicMakerViewController: UIViewController {
         button.layer.cornerRadius = 12
         return button
     }()
+    private let goToVisualizerButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(systemName: "video.fill"), for: .normal)
+        button.tintColor = .white
+        button.backgroundColor = Color.grayDark
+        button.layer.cornerRadius = 12
+        return button
+    }()
     private let layersButton: UIButton = {
         let button = UIButton()
         button.setTitle("Слои", for: .normal)
@@ -68,7 +76,7 @@ class MusicMakerViewController: UIViewController {
         return view
     }()
     private lazy var controlsView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [layersButton, UIView(), recordToFileButton, playButton, recordMicButton])
+        let stackView = UIStackView(arrangedSubviews: [layersButton, UIView(), recordToFileButton, playButton, goToVisualizerButton, recordMicButton])
         stackView.axis = .horizontal
         stackView.spacing = 16
         return stackView
@@ -215,6 +223,10 @@ class MusicMakerViewController: UIViewController {
             make.width.height.equalTo(50)
         }
         
+        goToVisualizerButton.snp.makeConstraints { make in
+            make.width.height.equalTo(50)
+        }
+        
         layersButton.snp.makeConstraints { make in
             make.height.equalTo(50)
             make.width.equalTo(110)
@@ -346,6 +358,20 @@ class MusicMakerViewController: UIViewController {
             })
             .disposed(by: bag)
         
+        goToVisualizerButton.rx.tap
+            .withLatestFrom(layers)
+            .bind(onNext: { [weak self] layers in
+                let visualizerVC = VisualizerViewController(layers: layers.map({ layerVM in
+                    return VisualizationEntity(
+                        isMuted: layerVM.isMuted.value,
+                        speed: layerVM.speed.value,
+                        volume: layerVM.volume.value
+                    )
+                }))
+                self?.navigationController?.pushViewController(visualizerVC, animated: true)
+            })
+            .disposed(by: bag)
+        
         micRecorder.recordedToFile
             .map { AudioRecordingLayerViewModel(sample: Sample(
                 name: "Запись",
@@ -382,10 +408,28 @@ class MusicMakerViewController: UIViewController {
             .disposed(by: bag)
         
         trackRecorder.recordedSuccessfulyToFile
-            .bind { [weak self] fileURL in
-                self?.shareFile(at: fileURL)
+            .withLatestFrom(layers) { ($0, $1) }
+            .bind { [weak self] data in
+                let (trackURL, layers) = data
+                self?.isPlaying.onNext(false)
+                self?.goToSharingVisualization(
+                    layers: layers.map({ layerVM in
+                        return VisualizationEntity(
+                            isMuted: layerVM.isMuted.value,
+                            speed: layerVM.speed.value,
+                            volume: layerVM.volume.value
+                        )
+                    }),
+                    withTrackAt: trackURL
+                )
             }
             .disposed(by: bag)
+        
+//        trackRecorder.recordedSuccessfulyToFile
+//            .bind { [weak self] fileURL in
+//                self?.shareFile(at: fileURL)
+//            }
+//            .disposed(by: bag)
         
         recordToFileButton.rx.tap
             .withLatestFrom(trackRecorder.isRecording)
@@ -478,6 +522,16 @@ class MusicMakerViewController: UIViewController {
             .map { $0.first }
             .bind(to: currentlySelectedLayer)
             .disposed(by: bag)
+    }
+    
+    private func goToSharingVisualization(
+        layers: [VisualizationEntity],
+        withTrackAt fileURL: URL
+    ) {
+        DispatchQueue.main.async {
+            let visualizerVC = VisualizerPreviewViewController(layers: layers, trackUrl: fileURL)
+            self.navigationController?.pushViewController(visualizerVC, animated: true)
+        }
     }
     
     private func shareFile(at fileURL: URL) {

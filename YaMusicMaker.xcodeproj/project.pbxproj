@@ -17,6 +17,11 @@
 		C6005CFA2AF6D6B10097B76E /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6005CF92AF6D6B10097B76E /* Constants.swift */; };
 		C6005CFC2AF6DDAE0097B76E /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6005CFB2AF6DDAE0097B76E /* AudioService.swift */; };
 		C67AB08F2B1A319B00D06705 /* AudioAnalyzeHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67AB08E2B1A319B00D06705 /* AudioAnalyzeHelper.swift */; };
+		C695E1352B1AF4CC00945868 /* VisualizerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C695E1342B1AF4CC00945868 /* VisualizerViewController.swift */; };
+		C695E1372B1AFB8E00945868 /* Visualizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C695E1362B1AFB8E00945868 /* Visualizer.swift */; };
+		C695E1392B1B0A1700945868 /* VisualizerPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C695E1382B1B0A1700945868 /* VisualizerPreviewViewController.swift */; };
+		C695E13B2B1B19D200945868 /* blank.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = C695E13A2B1B19D200945868 /* blank.mp4 */; };
+		C695E13D2B1B1C5000945868 /* VisualizationLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C695E13C2B1B1C5000945868 /* VisualizationLayer.swift */; };
 		C6B2DCC22AF7CCBF00C95593 /* TrackRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B2DCC12AF7CCBF00C95593 /* TrackRecorder.swift */; };
 		C6B2DCC42AF7D95C00C95593 /* UnsafeBufferPointer+ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B2DCC32AF7D95C00C95593 /* UnsafeBufferPointer+ext.swift */; };
 		C6B2DCC62AF7D97100C95593 /* WaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B2DCC52AF7D97100C95593 /* WaveformView.swift */; };
@@ -54,6 +59,11 @@
 		C6005CF92AF6D6B10097B76E /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		C6005CFB2AF6DDAE0097B76E /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
 		C67AB08E2B1A319B00D06705 /* AudioAnalyzeHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioAnalyzeHelper.swift; sourceTree = "<group>"; };
+		C695E1342B1AF4CC00945868 /* VisualizerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerViewController.swift; sourceTree = "<group>"; };
+		C695E1362B1AFB8E00945868 /* Visualizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Visualizer.swift; sourceTree = "<group>"; };
+		C695E1382B1B0A1700945868 /* VisualizerPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerPreviewViewController.swift; sourceTree = "<group>"; };
+		C695E13A2B1B19D200945868 /* blank.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = blank.mp4; path = ../../../../Downloads/blank.mp4; sourceTree = "<group>"; };
+		C695E13C2B1B1C5000945868 /* VisualizationLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizationLayer.swift; sourceTree = "<group>"; };
 		C6B2DCC12AF7CCBF00C95593 /* TrackRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackRecorder.swift; sourceTree = "<group>"; };
 		C6B2DCC32AF7D95C00C95593 /* UnsafeBufferPointer+ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UnsafeBufferPointer+ext.swift"; sourceTree = "<group>"; };
 		C6B2DCC52AF7D97100C95593 /* WaveformView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformView.swift; sourceTree = "<group>"; };
@@ -112,6 +122,7 @@
 		C6005CEC2AF6A3660097B76E /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				C695E13A2B1B19D200945868 /* blank.mp4 */,
 				C6B2DCC82AF7DDCB00C95593 /* brass1.wav */,
 				C6B2DCC92AF7DDCB00C95593 /* brass2.wav */,
 				C6B2DCC72AF7DDCB00C95593 /* brass3.wav */,
@@ -145,6 +156,37 @@
 				C6B2DCC52AF7D97100C95593 /* WaveformView.swift */,
 			);
 			path = Components;
+			sourceTree = "<group>";
+		};
+		C695E1312B1AF49F00945868 /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				C695E1332B1AF4C000945868 /* Visualizer */,
+				C695E1322B1AF4A800945868 /* Sequencer */,
+			);
+			path = ViewControllers;
+			sourceTree = "<group>";
+		};
+		C695E1322B1AF4A800945868 /* Sequencer */ = {
+			isa = PBXGroup;
+			children = (
+				C6005CEA2AF6A11F0097B76E /* LayerTableViewCell.swift */,
+				C6C630532AF572EF00DF73AC /* SampleEditorView.swift */,
+				C6C6304F2AF55E2300DF73AC /* SampleSelectorControl.swift */,
+				C6C6303F2AF553F600DF73AC /* MusicMakerViewController.swift */,
+			);
+			path = Sequencer;
+			sourceTree = "<group>";
+		};
+		C695E1332B1AF4C000945868 /* Visualizer */ = {
+			isa = PBXGroup;
+			children = (
+				C695E1342B1AF4CC00945868 /* VisualizerViewController.swift */,
+				C695E1362B1AFB8E00945868 /* Visualizer.swift */,
+				C695E1382B1B0A1700945868 /* VisualizerPreviewViewController.swift */,
+				C695E13C2B1B1C5000945868 /* VisualizationLayer.swift */,
+			);
+			path = Visualizer;
 			sourceTree = "<group>";
 		};
 		C6C529AC2AF7123A00A2F643 /* Extensions */ = {
@@ -192,16 +234,13 @@
 				C6C6303B2AF553F600DF73AC /* AppDelegate.swift */,
 				C6C630512AF56FCA00DF73AC /* Color.swift */,
 				C6005CF92AF6D6B10097B76E /* Constants.swift */,
-				C6C6303F2AF553F600DF73AC /* MusicMakerViewController.swift */,
-				C6005CEA2AF6A11F0097B76E /* LayerTableViewCell.swift */,
-				C6C630532AF572EF00DF73AC /* SampleEditorView.swift */,
-				C6C6304F2AF55E2300DF73AC /* SampleSelectorControl.swift */,
 				C6C6303D2AF553F600DF73AC /* SceneDelegate.swift */,
 				C6005CF42AF6A6B40097B76E /* Components */,
 				C6C529AC2AF7123A00A2F643 /* Extensions */,
 				C6005CF02AF6A3900097B76E /* Model */,
 				C6005CEC2AF6A3660097B76E /* Resources */,
 				C6C529B32AF7BFAF00A2F643 /* Services */,
+				C695E1312B1AF49F00945868 /* ViewControllers */,
 			);
 			path = YaMusicMaker;
 			sourceTree = "<group>";
@@ -273,6 +312,7 @@
 				C6C630482AF553F700DF73AC /* LaunchScreen.storyboard in Resources */,
 				C6B2DCCC2AF7DDCC00C95593 /* brass2.wav in Resources */,
 				C6005CF12AF6A52E0097B76E /* hihat.wav in Resources */,
+				C695E13B2B1B19D200945868 /* blank.mp4 in Resources */,
 				C6005CF22AF6A5310097B76E /* snare.wav in Resources */,
 				C6B2DCD02AF7DEC700C95593 /* piano2.wav in Resources */,
 				C6B2DCCA2AF7DDCC00C95593 /* brass3.wav in Resources */,
@@ -332,11 +372,15 @@
 				C6C630642AF6970E00DF73AC /* LayerViewModel.swift in Sources */,
 				C6005CFA2AF6D6B10097B76E /* Constants.swift in Sources */,
 				C6C630402AF553F600DF73AC /* MusicMakerViewController.swift in Sources */,
+				C695E1372B1AFB8E00945868 /* Visualizer.swift in Sources */,
 				C6C529B02AF7282F00A2F643 /* AudioRecordingLayerViewModel.swift in Sources */,
 				C6C6303C2AF553F600DF73AC /* AppDelegate.swift in Sources */,
 				C6C529AE2AF7124600A2F643 /* UITableViewCell+Ext.swift in Sources */,
+				C695E1392B1B0A1700945868 /* VisualizerPreviewViewController.swift in Sources */,
 				C6005CEB2AF6A11F0097B76E /* LayerTableViewCell.swift in Sources */,
 				C6B2DCC42AF7D95C00C95593 /* UnsafeBufferPointer+ext.swift in Sources */,
+				C695E13D2B1B1C5000945868 /* VisualizationLayer.swift in Sources */,
+				C695E1352B1AF4CC00945868 /* VisualizerViewController.swift in Sources */,
 				C6B2DCC22AF7CCBF00C95593 /* TrackRecorder.swift in Sources */,
 				C67AB08F2B1A319B00D06705 /* AudioAnalyzeHelper.swift in Sources */,
 				C6C529B52AF7C20800A2F643 /* FileManager+ext.swift in Sources */,
