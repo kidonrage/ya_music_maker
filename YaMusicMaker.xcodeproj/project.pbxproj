@@ -16,6 +16,7 @@
 		C6005CF82AF6D51C0097B76E /* Sample.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6005CF72AF6D51C0097B76E /* Sample.swift */; };
 		C6005CFA2AF6D6B10097B76E /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6005CF92AF6D6B10097B76E /* Constants.swift */; };
 		C6005CFC2AF6DDAE0097B76E /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6005CFB2AF6DDAE0097B76E /* AudioService.swift */; };
+		C67AB08F2B1A319B00D06705 /* AudioAnalyzeHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67AB08E2B1A319B00D06705 /* AudioAnalyzeHelper.swift */; };
 		C6B2DCC22AF7CCBF00C95593 /* TrackRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B2DCC12AF7CCBF00C95593 /* TrackRecorder.swift */; };
 		C6B2DCC42AF7D95C00C95593 /* UnsafeBufferPointer+ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B2DCC32AF7D95C00C95593 /* UnsafeBufferPointer+ext.swift */; };
 		C6B2DCC62AF7D97100C95593 /* WaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B2DCC52AF7D97100C95593 /* WaveformView.swift */; };
@@ -52,6 +53,7 @@
 		C6005CF72AF6D51C0097B76E /* Sample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sample.swift; sourceTree = "<group>"; };
 		C6005CF92AF6D6B10097B76E /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		C6005CFB2AF6DDAE0097B76E /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
+		C67AB08E2B1A319B00D06705 /* AudioAnalyzeHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioAnalyzeHelper.swift; sourceTree = "<group>"; };
 		C6B2DCC12AF7CCBF00C95593 /* TrackRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackRecorder.swift; sourceTree = "<group>"; };
 		C6B2DCC32AF7D95C00C95593 /* UnsafeBufferPointer+ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UnsafeBufferPointer+ext.swift"; sourceTree = "<group>"; };
 		C6B2DCC52AF7D97100C95593 /* WaveformView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformView.swift; sourceTree = "<group>"; };
@@ -161,6 +163,7 @@
 				C6005CFB2AF6DDAE0097B76E /* AudioService.swift */,
 				C6C529B12AF7BFA500A2F643 /* MicRecorder.swift */,
 				C6B2DCC12AF7CCBF00C95593 /* TrackRecorder.swift */,
+				C67AB08E2B1A319B00D06705 /* AudioAnalyzeHelper.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -335,6 +338,7 @@
 				C6005CEB2AF6A11F0097B76E /* LayerTableViewCell.swift in Sources */,
 				C6B2DCC42AF7D95C00C95593 /* UnsafeBufferPointer+ext.swift in Sources */,
 				C6B2DCC22AF7CCBF00C95593 /* TrackRecorder.swift in Sources */,
+				C67AB08F2B1A319B00D06705 /* AudioAnalyzeHelper.swift in Sources */,
 				C6C529B52AF7C20800A2F643 /* FileManager+ext.swift in Sources */,
 				C6C630502AF55E2300DF73AC /* SampleSelectorControl.swift in Sources */,
 				C6005CF82AF6D51C0097B76E /* Sample.swift in Sources */,

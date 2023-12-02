@@ -102,7 +102,7 @@ class MusicMakerViewController: UIViewController {
     
     private let isPlaying = BehaviorSubject<Bool>(value: false)
     
-    private let isLayersListExpanded = BehaviorSubject<Bool>(value: false)
+    private let isLayersListExpanded = BehaviorRelay<Bool>(value: false)
     
     private let newSampleSelected = PublishSubject<Sample>()
     private let newLayerCreated = PublishSubject<LayerViewModel>()
@@ -143,8 +143,13 @@ class MusicMakerViewController: UIViewController {
     
     private var bag = DisposeBag()
     
+    private let audioAnalyzeService = AudioAnalyzeHelper()
+    
     private let sampleSelectorPanelHeight: CGFloat = 80
     private var waveformsize: CGSize = .zero
+    private var displayedWaveformScales = [CGFloat]()
+    
+    private let waveformGenerationQueue = DispatchQueue(label: "waveform.queue")
     
     // MARK: - Lifecycle
     
@@ -153,14 +158,12 @@ class MusicMakerViewController: UIViewController {
         
         waveformsize = waveformView.frame.size
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupUI()
         setupBindings()
-        
-        layersTableView.reloadData()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -184,6 +187,7 @@ class MusicMakerViewController: UIViewController {
         view.addSubview(sampleEditor)
         view.addSubview(waveformView)
         view.addSubview(layersTableView)
+        setupLayersTableConstraints(isExpanded: isLayersListExpanded.value)
         view.addSubview(controlsView)
         view.addSubview(saplesSelectorsContainer)
         
@@ -261,15 +265,14 @@ class MusicMakerViewController: UIViewController {
     }
     
     private func setupLayersTableConstraints(isExpanded: Bool) {
-        layersTableView.snp.removeConstraints()
         if isExpanded {
-            layersTableView.snp.makeConstraints { make in
+            layersTableView.snp.remakeConstraints { make in
                 make.leading.trailing.equalTo(view.safeAreaLayoutGuide)
                 make.bottom.equalTo(controlsView.snp.top).inset(-16)
                 make.top.greaterThanOrEqualTo(sampleEditor.snp.top)
             }
         } else {
-            layersTableView.snp.makeConstraints { make in
+            layersTableView.snp.remakeConstraints { make in
                 make.leading.trailing.equalTo(view.safeAreaLayoutGuide)
                 make.top.greaterThanOrEqualTo(view.snp.bottom)
             }
@@ -278,26 +281,31 @@ class MusicMakerViewController: UIViewController {
     
     private func setupWaveformObserver() {
         AudioService.shared.soundAnalysisMixer.installTap(onBus: 0, bufferSize: 4096, format: nil) { [weak self] (buffer: AVAudioPCMBuffer?, time: AVAudioTime!) -> Void in
-            DispatchQueue.global().async {
+            self?.waveformGenerationQueue.async { [self] in
                 guard
                     let self,
-                    let buffer,
-                    let channelData = buffer.floatChannelData
+                    let buffer
                 else { return }
-                //
-                let floatArray = UnsafeBufferPointer(start: channelData[0], count: Int(buffer.frameLength))
                 
-                self.waveformView.generateWaveImage(
-                    samples: floatArray,
+                let scaleFactor = self.audioAnalyzeService.getScaleFromSamples(buffer: buffer) ?? .zero
+                
+                let ticksCount = 70
+                let tempScales = self.displayedWaveformScales.suffix(ticksCount - 1) + [scaleFactor]
+                var updatedScales = Array<CGFloat>(repeating: .zero, count: ticksCount - tempScales.count)
+                updatedScales += tempScales
+                self.displayedWaveformScales = updatedScales
+                
+                self.waveformView.generateWaveImage2(
+                    scales: updatedScales,
                     imageSize: self.waveformsize,
                     strokeColor: Color.green,
                     backgroundColor: Color.grayDark2,
-                    waveWidth: 3,
-                    waveSpacing: 3) { image in
-                        DispatchQueue.main.async {
-                            self.waveformView.image = image
-                        }
+                    waveSpacing: 3
+                ) { image in
+                    DispatchQueue.main.async {
+                        self.waveformView.image = image
                     }
+                }
             }
         }
     }
@@ -416,7 +424,7 @@ class MusicMakerViewController: UIViewController {
         // layers list
         let isLayersEmpty = layers
             .map { $0.isEmpty }
-
+        
         isLayersEmpty
             .map { !$0 }
             .bind(to: layersButton.rx.isEnabled)
@@ -429,6 +437,7 @@ class MusicMakerViewController: UIViewController {
             .disposed(by: bag)
         
         Observable.combineLatest(isLayersListExpanded, isLayersEmpty)
+            .skip(1)
             .bind { [weak self] isExpanded, isLayersEmpty in
                 UIView.animate(withDuration: 0.25) {
                     self?.setupLayersTableConstraints(isExpanded: isExpanded && !isLayersEmpty)
@@ -483,7 +492,7 @@ class MusicMakerViewController: UIViewController {
 
 // MARK: - UITableViewDelegate
 extension MusicMakerViewController: UITableViewDelegate {
-
+    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 56
     }
